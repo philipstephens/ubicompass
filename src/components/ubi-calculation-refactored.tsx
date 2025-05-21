@@ -22,6 +22,7 @@ import "./chart-icon.css";
 
 export const UbiCalculationRefactored = component$(() => {
   console.log("UbiCalculationRefactored component rendering");
+  console.log("UbiCalculationRefactored: Starting render");
 
   // Get the UBI data store
   const ubiStore = useContext(UbiDataContext);
@@ -102,11 +103,15 @@ export const UbiCalculationRefactored = component$(() => {
     return (ubiStore.selectedYear.ubiamount * 12) / 1000;
   });
 
-  // Calculate tax revenue for a quintile using the current tax model
+  // Calculate tax revenue for a quintile or decile using the current tax model
   const calculateTaxRevenue = $((entry: any) => {
     if (!currentTaxModel.value) return 0;
 
-    const taxpayers = ubiStore.selectedYear?.taxpayersperquintile || 0;
+    // Check if we're using quintile or decile data
+    const taxpayers =
+      "decile" in entry
+        ? ubiStore.selectedYear?.taxpayersperdecile || 0
+        : ubiStore.selectedYear?.taxpayersperquintile || 0;
     const income = entry.averagetaxableincome;
 
     // Get the current flat tax percentage
@@ -129,11 +134,15 @@ export const UbiCalculationRefactored = component$(() => {
     }
   });
 
-  // Calculate tax revenue with UBI for a quintile using the current tax model
+  // Calculate tax revenue with UBI for a quintile or decile using the current tax model
   const calculateTaxRevenueWithUBI = $((entry: any) => {
     if (!currentTaxModel.value) return 0;
 
-    const taxpayers = ubiStore.selectedYear?.taxpayersperquintile || 0;
+    // Check if we're using quintile or decile data
+    const taxpayers =
+      "decile" in entry
+        ? ubiStore.selectedYear?.taxpayersperdecile || 0
+        : ubiStore.selectedYear?.taxpayersperquintile || 0;
     const income = entry.averagetaxableincome;
     const ubiAmount = ((ubiStore.selectedYear?.ubiamount || 2000) * 12) / 1000;
     const exemptionAmount = ubiStore.selectedExemptionAmount || 24;
@@ -197,12 +206,16 @@ export const UbiCalculationRefactored = component$(() => {
     }
   });
 
-  // Calculate the net cost of UBI for a quintile using the current tax model
+  // Calculate the net cost of UBI for a quintile or decile using the current tax model
   const calculateUBICost = $((entry: any) => {
     if (!currentTaxModel.value) return 0;
 
     // Get the current values from the store
-    const taxpayers = ubiStore.selectedYear?.taxpayersperquintile || 0;
+    // Check if we're using quintile or decile data
+    const taxpayers =
+      "decile" in entry
+        ? ubiStore.selectedYear?.taxpayersperdecile || 0
+        : ubiStore.selectedYear?.taxpayersperquintile || 0;
     const income = entry.averagetaxableincome;
     const ubiAmount = ((ubiStore.selectedYear?.ubiamount || 2000) * 12) / 1000;
     const exemptionAmount = ubiStore.selectedExemptionAmount || 24;
