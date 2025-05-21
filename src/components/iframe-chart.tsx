@@ -42,7 +42,7 @@ export const IframeChart = component$(
     const prepareChartData = $(() => {
       // Convert tax entries to a format the iframe can use
       const chartData = taxEntries.map((entry) => ({
-        quintile: entry.quintile,
+        decile: "decile" in entry ? entry.decile : 0,
         averageTaxableIncome: entry.averagetaxableincome || 0,
         incomeWithUBI: calculateIncomeWithUBI(entry) || 0,
         lowerBound: entry.lowerBound || 0,
@@ -184,7 +184,7 @@ export const IframeChart = component$(
       <div style={{ width: "100%", minWidth: "1200px", maxWidth: "3600px" }}>
         <iframe
           ref={(el) => (iframeRef.value = el)}
-          src="/fixed-chart.html"
+          src="/fixed-chart-decile.html"
           class="border-0"
           style={{
             height: "680px",

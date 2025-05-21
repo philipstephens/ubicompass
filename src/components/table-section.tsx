@@ -68,7 +68,7 @@ export const TableSection = component$(
               color: "white",
             }}
           >
-            <TranslatableText text="UBI Impact by Income Quintile" />
+            <TranslatableText text="UBI Impact by Income Decile" />
           </h4>
 
           {/* View toggle button */}
@@ -146,16 +146,9 @@ export const TableSection = component$(
               />
             </div>
           ) : (
-            <QuintileDataTable
+            <DecileTable
               taxEntries={taxEntries}
-              calculateTaxRevenue={calculateTaxRevenue}
-              calculateTaxRevenueWithUBI={calculateTaxRevenueWithUBI}
-              calculateMedianTaxWithUBI={calculateMedianTaxWithUBI}
-              calculateUBICost={calculateUBICost}
               calculateIncomeWithUBI={calculateIncomeWithUBI}
-              flatTaxPercentage={flatTaxPercentage}
-              ubiAmount={ubiAmount}
-              exemptionAmount={exemptionAmount}
             />
           )}
         </div>
