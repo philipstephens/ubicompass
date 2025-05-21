@@ -1,0 +1,47 @@
+/* CSS for index.tsx with explicit control over vertical spacing */
+
+/* Page background */
+.bg-gray-200 {
+  background-color: #e5e7eb;
+}
+
+/* Container for all components */
+.header-container,
+.menu-container,
+.card-container {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+
+/* Ensure header has no bottom margin/padding */
+.header-container {
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+/* Ensure menu has no top or bottom margin/padding */
+.menu-container {
+  margin-top: 0;
+  padding-top: 0;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+/* Small gap between menu and card - about 2 medium-sized text characters */
+.small-gap {
+  height: 2em; /* 2 lines of text */
+  margin: 0;
+  padding: 0;
+}
+
+/* Card container */
+.card-container {
+  margin-top: 0;
+  padding-top: 0;
+  width: calc(100% - 1rem); /* Full width minus small margin */
+  margin-left: 0.5rem;      /* mx-2 equivalent (0.5rem on each side) */
+  margin-right: 0.5rem;
+  padding-left: 0;
+  padding-right: 0;
+}

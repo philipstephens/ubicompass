@@ -1,0 +1,495 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fixed Height Chart</title>
+    <script>
+      // Translations for chart labels
+      const translations = {
+        // Chart title
+        "Income Comparison by Quintile": {
+          es: "Comparación de Ingresos por Quintil",
+          fr: "Comparaison des Revenus par Quintile",
+          de: "Einkommensvergleich nach Quintil",
+        },
+        // Legend labels
+        "Average Taxable Income": {
+          es: "Ingreso Imponible Promedio",
+          fr: "Revenu Imposable Moyen",
+          de: "Durchschnittliches steuerpflichtiges Einkommen",
+        },
+        "Income with UBI": {
+          es: "Ingreso con RBU",
+          fr: "Revenu avec RBU",
+          de: "Einkommen mit UBI",
+        },
+        // Axis labels
+        "Income (thousands)": {
+          es: "Ingresos (miles)",
+          fr: "Revenus (milliers)",
+          de: "Einkommen (Tausend)",
+        },
+        "Income Quintile": {
+          es: "Quintil de Ingresos",
+          fr: "Quintile de Revenu",
+          de: "Einkommensquintil",
+        },
+        // Quintile descriptions
+        "Lowest 20%": {
+          es: "20% más bajo",
+          fr: "20% les plus bas",
+          de: "Niedrigste 20%",
+        },
+        "Lower-middle 20%": {
+          es: "20% medio-bajo",
+          fr: "20% moyen-bas",
+          de: "Untere-Mitte 20%",
+        },
+        "Middle 20%": {
+          es: "20% medio",
+          fr: "20% moyen",
+          de: "Mittlere 20%",
+        },
+        "Upper-middle 20%": {
+          es: "20% medio-alto",
+          fr: "20% moyen-haut",
+          de: "Obere-Mitte 20%",
+        },
+        "Highest 20%": {
+          es: "20% más alto",
+          fr: "20% les plus hauts",
+          de: "Höchste 20%",
+        },
+        // Footer text
+        "* All values are in thousands of dollars.": {
+          es: "* Todos los valores están en miles de dólares.",
+          fr: "* Toutes les valeurs sont en milliers de dollars.",
+          de: "* Alle Werte sind in Tausend Dollar angegeben.",
+        },
+        "Each quintile represents exactly 20% of the taxpayer population. Quintiles divide the population into five equal groups based on income level, from lowest (Q1) to highest (Q5).":
+          {
+            es: "Cada quintil representa exactamente el 20% de la población de contribuyentes. Los quintiles dividen a la población en cinco grupos iguales según el nivel de ingresos, desde el más bajo (Q1) hasta el más alto (Q5).",
+            fr: "Chaque quintile représente exactement 20% de la population des contribuables. Les quintiles divisent la population en cinq groupes égaux selon le niveau de revenu, du plus bas (Q1) au plus haut (Q5).",
+            de: "Jedes Quintil repräsentiert genau 20% der Steuerzahlerpopulation. Quintile teilen die Bevölkerung in fünf gleiche Gruppen basierend auf dem Einkommensniveau, vom niedrigsten (Q1) bis zum höchsten (Q5).",
+          },
+      };
+
+      // Current language (default to English)
+      let currentLanguage = "en";
+
+      // Function to translate text
+      function translateText(text) {
+        if (currentLanguage === "en") return text;
+        return translations[text]?.[currentLanguage] || text;
+      }
+
+      // Function to update all text elements with translations
+      function updateTranslations() {
+        console.log(
+          "Chart: Updating translations to language:",
+          currentLanguage
+        );
+
+        try {
+          // Update chart title
+          const title = document.querySelector("h2");
+          if (title) {
+            title.textContent = translateText("Income Comparison by Quintile");
+            console.log("Chart: Updated title");
+          } else {
+            console.error("Chart: Could not find h2 element");
+          }
+
+          // Update legend labels
+          const legendItems = document.querySelectorAll(".legend-text");
+          if (legendItems && legendItems.length >= 2) {
+            legendItems[0].textContent = translateText(
+              "Average Taxable Income"
+            );
+            legendItems[1].textContent = translateText("Income with UBI");
+            console.log("Chart: Updated legend labels");
+          } else {
+            console.error("Chart: Could not find legend items", legendItems);
+          }
+
+          // Update axis titles
+          const yAxisTitle = document.querySelector(".y-axis-title");
+          const xAxisTitle = document.querySelector(".x-axis-title");
+          if (yAxisTitle) {
+            yAxisTitle.textContent = translateText("Income (thousands)");
+            console.log("Chart: Updated y-axis title");
+          } else {
+            console.error("Chart: Could not find y-axis title");
+          }
+          if (xAxisTitle) {
+            xAxisTitle.textContent = translateText("Income Quintile");
+            console.log("Chart: Updated x-axis title");
+          } else {
+            console.error("Chart: Could not find x-axis title");
+          }
+
+          // Update quintile descriptions
+          const quintileDescs = document.querySelectorAll(".quintile-desc");
+          if (quintileDescs && quintileDescs.length >= 5) {
+            quintileDescs[0].textContent = translateText("Lowest 20%");
+            quintileDescs[1].textContent = translateText("Lower-middle 20%");
+            quintileDescs[2].textContent = translateText("Middle 20%");
+            quintileDescs[3].textContent = translateText("Upper-middle 20%");
+            quintileDescs[4].textContent = translateText("Highest 20%");
+            console.log("Chart: Updated quintile descriptions");
+          } else {
+            console.error(
+              "Chart: Could not find quintile descriptions",
+              quintileDescs
+            );
+          }
+
+          // Update footer text
+          const footerParagraphs = document.querySelectorAll(".footer p");
+          if (footerParagraphs && footerParagraphs.length >= 2) {
+            footerParagraphs[0].textContent = translateText(
+              "* All values are in thousands of dollars."
+            );
+            footerParagraphs[1].textContent = translateText(
+              "Each quintile represents exactly 20% of the taxpayer population. Quintiles divide the population into five equal groups based on income level, from lowest (Q1) to highest (Q5)."
+            );
+            console.log("Chart: Updated footer text");
+          } else {
+            console.error(
+              "Chart: Could not find footer paragraphs",
+              footerParagraphs
+            );
+          }
+
+          console.log("Chart: Translation update completed");
+        } catch (error) {
+          console.error("Chart: Error updating translations", error);
+        }
+      }
+
+      // Listen for messages from the parent window
+      window.addEventListener("message", function (event) {
+        console.log("Chart: Received message from parent", event.data);
+
+        // Handle language change message
+        if (event.data && event.data.type === "setLanguage") {
+          currentLanguage = event.data.language || "en";
+          console.log("Chart: Language changed to", currentLanguage);
+          updateTranslations();
+        }
+
+        // Handle data update message (already implemented in your chart)
+        if (event.data && event.data.taxEntries) {
+          console.log("Chart: Received data", event.data);
+          // If language is included in the data, update it
+          if (event.data.language) {
+            currentLanguage = event.data.language;
+            console.log("Chart: Language from data message:", currentLanguage);
+            updateTranslations();
+          }
+        }
+      });
+
+      // Call updateTranslations on load to ensure initial translation
+      window.addEventListener("load", function () {
+        console.log("Chart: Window loaded, updating translations");
+        updateTranslations();
+      });
+
+      // Notify parent that chart is ready
+      window.addEventListener("DOMContentLoaded", function () {
+        console.log("Chart: DOM loaded, sending CHART_READY message");
+        window.parent.postMessage({ type: "CHART_READY" }, "*");
+      });
+    </script>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: white;
+      }
+      .chart-container {
+        width: 100%;
+        max-width: 1600px;
+        margin: 0 auto;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      h2 {
+        text-align: center;
+        margin-bottom: 15px;
+        font-size: 20px;
+        color: #333;
+      }
+      .legend {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 15px;
+      }
+      .legend-item {
+        display: flex;
+        align-items: center;
+        margin: 0 15px;
+      }
+      .legend-color {
+        width: 20px;
+        height: 20px;
+        margin-right: 10px;
+        border-radius: 4px;
+      }
+      .blue {
+        background-color: #3b82f6;
+      }
+      .green {
+        background-color: #10b981;
+      }
+      .chart {
+        display: flex;
+        justify-content: space-around;
+        align-items: flex-end;
+        height: 380px;
+        border-left: 2px solid #333;
+        border-bottom: 2px solid #333;
+        position: relative;
+        margin-left: 80px;
+        padding-right: 40px;
+        width: 1200px;
+        max-width: calc(100% - 120px);
+        margin-bottom: 80px;
+      }
+      .y-axis {
+        position: absolute;
+        left: -50px;
+        top: 0;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: flex-end;
+        padding-right: 15px;
+      }
+      .y-axis-label {
+        font-size: 14px;
+        color: #333;
+        font-weight: bold;
+      }
+      .grid-line {
+        position: absolute;
+        left: 0;
+        right: 0;
+        border-top: 1px dashed #ccc;
+      }
+      .x-axis {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: -60px;
+        display: flex;
+        justify-content: space-around;
+      }
+      .x-axis-label {
+        text-align: center;
+      }
+      .quintile-badge {
+        background-color: #e6f0ff;
+        color: #0066cc;
+        font-weight: bold;
+        padding: 3px 10px;
+        border-radius: 15px;
+        margin-bottom: 4px;
+        font-size: 14px;
+        display: inline-block;
+      }
+      .quintile-desc {
+        font-size: 12px;
+        color: #666;
+      }
+      .bar-group {
+        display: flex;
+        width: 250px;
+        justify-content: center;
+        align-items: flex-end;
+      }
+      .bar {
+        width: 100px;
+        margin: 0 10px;
+        position: relative;
+        border-radius: 6px 6px 0 0;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        align-self: flex-end;
+      }
+      .bar-blue {
+        background-color: #3b82f6;
+        background-image: linear-gradient(to top, #3b82f6, #60a5fa);
+      }
+      .bar-green {
+        background-color: #10b981;
+        background-image: linear-gradient(to top, #10b981, #34d399);
+      }
+      .bar-value {
+        position: absolute;
+        top: -25px;
+        left: 0;
+        right: 0;
+        text-align: center;
+        font-size: 14px;
+        font-weight: bold;
+        color: #333;
+      }
+      .footer {
+        margin-top: 10px;
+        padding: 6px;
+        background-color: #f9fafb;
+        border-radius: 8px;
+        font-size: 11px;
+        color: #555;
+      }
+      .axis-title {
+        position: absolute;
+        font-size: 16px;
+        color: #333;
+        font-weight: bold;
+      }
+      .y-axis-title {
+        transform: rotate(-90deg);
+        left: -90px;
+        top: 50%;
+        transform-origin: left top;
+      }
+      .x-axis-title {
+        bottom: -90px;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="chart-container">
+      <h2>Income Comparison by Quintile</h2>
+
+      <div class="legend">
+        <div class="legend-item">
+          <div class="legend-color blue"></div>
+          <span class="legend-text">Average Taxable Income</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color green"></div>
+          <span class="legend-text">Income with UBI</span>
+        </div>
+      </div>
+
+      <div class="chart">
+        <!-- Y-axis -->
+        <div class="y-axis">
+          <div class="y-axis-label">$250k</div>
+          <div class="y-axis-label">$200k</div>
+          <div class="y-axis-label">$150k</div>
+          <div class="y-axis-label">$100k</div>
+          <div class="y-axis-label">$50k</div>
+          <div class="y-axis-label">$0k</div>
+        </div>
+
+        <!-- Y-axis title -->
+        <div class="axis-title y-axis-title">Income (thousands)</div>
+
+        <!-- Grid lines -->
+        <div class="grid-line" style="top: 0%"></div>
+        <div class="grid-line" style="top: 20%"></div>
+        <div class="grid-line" style="top: 40%"></div>
+        <div class="grid-line" style="top: 60%"></div>
+        <div class="grid-line" style="top: 80%"></div>
+        <div class="grid-line" style="top: 100%"></div>
+
+        <!-- Q1 -->
+        <div class="bar-group">
+          <div class="bar bar-blue" style="height: 30px">
+            <div class="bar-value">$20k</div>
+          </div>
+          <div class="bar bar-green" style="height: 66px">
+            <div class="bar-value">$44k</div>
+          </div>
+        </div>
+
+        <!-- Q2 -->
+        <div class="bar-group">
+          <div class="bar bar-blue" style="height: 60px">
+            <div class="bar-value">$40k</div>
+          </div>
+          <div class="bar bar-green" style="height: 96px">
+            <div class="bar-value">$64k</div>
+          </div>
+        </div>
+
+        <!-- Q3 -->
+        <div class="bar-group">
+          <div class="bar bar-blue" style="height: 90px">
+            <div class="bar-value">$60k</div>
+          </div>
+          <div class="bar bar-green" style="height: 126px">
+            <div class="bar-value">$84k</div>
+          </div>
+        </div>
+
+        <!-- Q4 -->
+        <div class="bar-group">
+          <div class="bar bar-blue" style="height: 150px">
+            <div class="bar-value">$100k</div>
+          </div>
+          <div class="bar bar-green" style="height: 186px">
+            <div class="bar-value">$124k</div>
+          </div>
+        </div>
+
+        <!-- Q5 -->
+        <div class="bar-group">
+          <div class="bar bar-blue" style="height: 300px">
+            <div class="bar-value">$200k</div>
+          </div>
+          <div class="bar bar-green" style="height: 336px">
+            <div class="bar-value">$224k</div>
+          </div>
+        </div>
+
+        <!-- X-axis -->
+        <div class="x-axis">
+          <div class="x-axis-label">
+            <div class="quintile-badge">Q1</div>
+            <div class="quintile-desc">Lowest 20%</div>
+          </div>
+          <div class="x-axis-label">
+            <div class="quintile-badge">Q2</div>
+            <div class="quintile-desc">Lower-middle 20%</div>
+          </div>
+          <div class="x-axis-label">
+            <div class="quintile-badge">Q3</div>
+            <div class="quintile-desc">Middle 20%</div>
+          </div>
+          <div class="x-axis-label">
+            <div class="quintile-badge">Q4</div>
+            <div class="quintile-desc">Upper-middle 20%</div>
+          </div>
+          <div class="x-axis-label">
+            <div class="quintile-badge">Q5</div>
+            <div class="quintile-desc">Highest 20%</div>
+          </div>
+        </div>
+
+        <!-- X-axis title -->
+        <div class="axis-title x-axis-title">Income Quintile</div>
+      </div>
+
+      <div class="footer">
+        <p>* All values are in thousands of dollars.</p>
+        <p style="margin-top: 8px">
+          Each quintile represents exactly 20% of the taxpayer population.
+          Quintiles divide the population into five equal groups based on income
+          level, from lowest (Q1) to highest (Q5).
+        </p>
+      </div>
+    </div>
+  </body>
+</html>
