@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minimal Chart Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .svg-chart { width: 100%; height: 300px; border: 1px solid #ccc; }
+    </style>
+</head>
+<body>
+    <h1>Minimal Chart Test</h1>
+    
+    <div class="test-section">
+        <h2>Test 1: Basic SVG Creation</h2>
+        <svg id="test-svg" class="svg-chart" viewBox="0 0 400 200">
+            <!-- This should show a simple test -->
+        </svg>
+        <p id="svg-test-result">Testing...</p>
+    </div>
+    
+    <div class="test-section">
+        <h2>Test 2: Multi-Bar Chart Simulation</h2>
+        <svg id="multi-bar-svg" class="svg-chart" viewBox="0 0 600 300">
+            <!-- This will simulate our multi-bar chart -->
+        </svg>
+        <p id="multi-bar-result">Testing...</p>
+    </div>
+    
+    <div class="test-section">
+        <h2>Test 3: Function Test</h2>
+        <div id="function-test-result">Testing...</div>
+    </div>
+    
+    <script>
+        // Test 1: Basic SVG functionality
+        function testBasicSVG() {
+            const svg = document.getElementById('test-svg');
+            const result = document.getElementById('svg-test-result');
+            
+            try {
+                // Create a simple rectangle
+                const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                rect.setAttribute('x', '50');
+                rect.setAttribute('y', '50');
+                rect.setAttribute('width', '100');
+                rect.setAttribute('height', '80');
+                rect.setAttribute('fill', '#3b82f6');
+                rect.setAttribute('rx', '5');
+                
+                svg.appendChild(rect);
+                
+                // Add text
+                const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                text.setAttribute('x', '100');
+                text.setAttribute('y', '100');
+                text.setAttribute('text-anchor', 'middle');
+                text.setAttribute('fill', 'white');
+                text.textContent = 'Test';
+                
+                svg.appendChild(text);
+                
+                result.textContent = '✅ Basic SVG creation works';
+                result.style.color = 'green';
+            } catch (error) {
+                result.textContent = `❌ Basic SVG creation failed: ${error.message}`;
+                result.style.color = 'red';
+            }
+        }
+        
+        // Test 2: Multi-bar chart simulation
+        function testMultiBarChart() {
+            const svg = document.getElementById('multi-bar-svg');
+            const result = document.getElementById('multi-bar-result');
+            
+            try {
+                const barWidth = 30;
+                const barSpacing = 60;
+                const height = 250;
+                
+                // Simulate 3 deciles with 3 bars each
+                for (let i = 0; i < 3; i++) {
+                    const x = 50 + i * barSpacing;
+                    
+                    // Bar 1: Stacked bar (income + UBI)
+                    // Bottom part (income)
+                    const incomeBar = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                    incomeBar.setAttribute('x', x - barWidth * 1.5);
+                    incomeBar.setAttribute('y', height - 80);
+                    incomeBar.setAttribute('width', barWidth);
+                    incomeBar.setAttribute('height', 80);
+                    incomeBar.setAttribute('fill', '#2196f3');
+                    incomeBar.setAttribute('rx', '3');
+                    svg.appendChild(incomeBar);
+                    
+                    // Top part (UBI)
+                    const ubiBar = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                    ubiBar.setAttribute('x', x - barWidth * 1.5);
+                    ubiBar.setAttribute('y', height - 120);
+                    ubiBar.setAttribute('width', barWidth);
+                    ubiBar.setAttribute('height', 40);
+                    ubiBar.setAttribute('fill', '#4caf50');
+                    ubiBar.setAttribute('rx', '3');
+                    svg.appendChild(ubiBar);
+                    
+                    // Bar 2: After-tax old
+                    const oldBar = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                    oldBar.setAttribute('x', x - barWidth / 2);
+                    oldBar.setAttribute('y', height - 90);
+                    oldBar.setAttribute('width', barWidth);
+                    oldBar.setAttribute('height', 90);
+                    oldBar.setAttribute('fill', '#673ab7');
+                    oldBar.setAttribute('rx', '3');
+                    svg.appendChild(oldBar);
+                    
+                    // Bar 3: After-tax new
+                    const newBar = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                    newBar.setAttribute('x', x + barWidth / 2);
+                    newBar.setAttribute('y', height - 70);
+                    newBar.setAttribute('width', barWidth);
+                    newBar.setAttribute('height', 70);
+                    newBar.setAttribute('fill', '#ff9800');
+                    newBar.setAttribute('rx', '3');
+                    svg.appendChild(newBar);
+                    
+                    // Label
+                    const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    label.setAttribute('x', x);
+                    label.setAttribute('y', height + 20);
+                    label.setAttribute('text-anchor', 'middle');
+                    label.setAttribute('fill', 'black');
+                    label.textContent = `D${i + 1}`;
+                    svg.appendChild(label);
+                }
+                
+                result.textContent = '✅ Multi-bar chart simulation works';
+                result.style.color = 'green';
+            } catch (error) {
+                result.textContent = `❌ Multi-bar chart simulation failed: ${error.message}`;
+                result.style.color = 'red';
+            }
+        }
+        
+        // Test 3: Function simulation
+        function testFunctions() {
+            const result = document.getElementById('function-test-result');
+            
+            try {
+                // Simulate our calculation function
+                function calculateAfterTaxIncomeNew(beforeTaxIncome) {
+                    const ubi = 24000; // $24k UBI
+                    const taxRate = 0.30; // 30% tax
+                    const exemption = 24000; // $24k exemption
+                    
+                    const beforeTaxIncomeDollars = beforeTaxIncome * 1000;
+                    const taxableAmount = Math.max(0, beforeTaxIncomeDollars + ubi - exemption);
+                    const taxPaid = taxableAmount * taxRate;
+                    const afterTaxIncome = beforeTaxIncomeDollars - taxPaid;
+                    
+                    return afterTaxIncome / 1000; // Return in thousands
+                }
+                
+                // Test with sample data
+                const testIncomes = [30, 50, 80, 120]; // in thousands
+                const results = testIncomes.map(income => {
+                    const afterTax = calculateAfterTaxIncomeNew(income);
+                    return `Income: $${income}k → After-tax: $${Math.round(afterTax)}k`;
+                });
+                
+                result.innerHTML = '✅ Function test works:<br>' + results.join('<br>');
+                result.style.color = 'green';
+            } catch (error) {
+                result.textContent = `❌ Function test failed: ${error.message}`;
+                result.style.color = 'red';
+            }
+        }
+        
+        // Run tests when page loads
+        window.addEventListener('load', () => {
+            testBasicSVG();
+            testMultiBarChart();
+            testFunctions();
+        });
+    </script>
+</body>
+</html>

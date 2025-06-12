@@ -9,31 +9,110 @@ export interface YearMetaData {
   ubiid: number;
   taxyear: number;
   ubiamount: number;
-  taxpayersperdecile: number;  // Changed from taxpayersperquintile
+  taxpayersperquintile?: number;  // For quintile-based calculations
+  taxpayersperdecile?: number;    // For decile-based calculations
   flattaxpercentage: number;
 }
 
 /**
- * Tax entry for a specific income decile
+ * Base tax entry interface
  */
-export interface TaxEntry {
+export interface BaseTaxEntry {
   entryid: number;
-  decile: number;  // Changed from quintile (now 1-10)
   averagetaxableincome: number;
   mediantax: number;
   ubiid: number;
-  // New fields for enhanced data
-  lowerBound: number;
-  upperBound: number;
-  populationCount: number;
+  // Enhanced data fields
+  lowerBound?: number;
+  upperBound?: number;
+  populationCount?: number;
+}
+
+/**
+ * Quintile-based tax entry
+ */
+export interface QuintileTaxEntry extends BaseTaxEntry {
+  quintile: number;  // 1-5
+}
+
+/**
+ * Decile-based tax entry
+ */
+export interface DecileTaxEntry extends BaseTaxEntry {
+  decile: number;  // 1-10
+}
+
+/**
+ * Union type for tax entries
+ */
+export type TaxEntry = QuintileTaxEntry | DecileTaxEntry;
+
+/**
+ * Create mock quintile data for testing
+ * @param ubiId The UBI ID to associate with the entries
+ * @returns An array of quintile tax entries
+ */
+export function createMockQuintileData(ubiId: number): QuintileTaxEntry[] {
+  return [
+    {
+      entryid: 1,
+      quintile: 1,
+      averagetaxableincome: 10,
+      mediantax: 0,
+      ubiid: ubiId,
+      lowerBound: 0,
+      upperBound: 20,
+      populationCount: 6140,
+    },
+    {
+      entryid: 2,
+      quintile: 2,
+      averagetaxableincome: 30,
+      mediantax: 2,
+      ubiid: ubiId,
+      lowerBound: 20,
+      upperBound: 40,
+      populationCount: 6140,
+    },
+    {
+      entryid: 3,
+      quintile: 3,
+      averagetaxableincome: 50,
+      mediantax: 5.5,
+      ubiid: ubiId,
+      lowerBound: 40,
+      upperBound: 60,
+      populationCount: 6140,
+    },
+    {
+      entryid: 4,
+      quintile: 4,
+      averagetaxableincome: 75,
+      mediantax: 11,
+      ubiid: ubiId,
+      lowerBound: 60,
+      upperBound: 100,
+      populationCount: 6140,
+    },
+    {
+      entryid: 5,
+      quintile: 5,
+      averagetaxableincome: 200,
+      mediantax: 35,
+      ubiid: ubiId,
+      lowerBound: 100,
+      upperBound: 500,
+      populationCount: 6140,
+    },
+  ];
 }
 
 /**
  * Create mock decile data for testing
  * @param ubiId The UBI ID to associate with the entries
- * @returns An array of tax entries for each decile
+ * @returns An array of decile tax entries
  */
-export function createMockDecileData(ubiId: number): TaxEntry[] {
+export function createMockDecileData(ubiId: number): DecileTaxEntry[] {
   return [
     {
       entryid: 1,
@@ -148,8 +227,97 @@ export function createMockYearData(): YearMetaData[] {
       ubiid: 1,
       taxyear: 2022,
       ubiamount: 2000,
+      taxpayersperquintile: 6140,
       taxpayersperdecile: 3070,
       flattaxpercentage: 30,
     },
   ];
+}
+
+/**
+ * Check if a tax entry is a quintile entry
+ */
+export function isQuintileEntry(entry: TaxEntry): entry is QuintileTaxEntry {
+  return 'quintile' in entry;
+}
+
+/**
+ * Check if a tax entry is a decile entry
+ */
+export function isDecileEntry(entry: TaxEntry): entry is DecileTaxEntry {
+  return 'decile' in entry;
+}
+
+/**
+ * Get the group number (quintile or decile) from a tax entry
+ */
+export function getGroupNumber(entry: TaxEntry): number {
+  if (isQuintileEntry(entry)) {
+    return entry.quintile;
+  } else if (isDecileEntry(entry)) {
+    return entry.decile;
+  }
+  return 0;
+}
+
+/**
+ * Get the description for a quintile
+ */
+export function getQuintileDescription(quintile: number): string {
+  switch (quintile) {
+    case 1:
+      return "Lowest 20%";
+    case 2:
+      return "20-40%";
+    case 3:
+      return "40-60%";
+    case 4:
+      return "60-80%";
+    case 5:
+      return "Highest 20%";
+    default:
+      return "";
+  }
+}
+
+/**
+ * Get the description for a decile
+ */
+export function getDecileDescription(decile: number): string {
+  switch (decile) {
+    case 1:
+      return "Lowest 10%";
+    case 2:
+      return "10-20%";
+    case 3:
+      return "20-30%";
+    case 4:
+      return "30-40%";
+    case 5:
+      return "40-50%";
+    case 6:
+      return "50-60%";
+    case 7:
+      return "60-70%";
+    case 8:
+      return "70-80%";
+    case 9:
+      return "80-90%";
+    case 10:
+      return "Highest 10%";
+    default:
+      return "";
+  }
+}
+
+/**
+ * Get the description for a group (quintile or decile)
+ */
+export function getGroupDescription(entry: TaxEntry): string {
+  if (isQuintileEntry(entry)) {
+    return getQuintileDescription(entry.quintile);
+  } else if (isDecileEntry(entry)) {
+    return getDecileDescription(entry.decile);
+  }
+  return "";
 }

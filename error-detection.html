@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error Detection</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .error-log { background: #f8f9fa; border: 1px solid #dee2e6; padding: 15px; border-radius: 5px; margin: 10px 0; }
+        .error { color: #dc3545; }
+        .warning { color: #ffc107; }
+        .info { color: #17a2b8; }
+        iframe { width: 100%; height: 400px; border: 1px solid #ccc; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <h1>JavaScript Error Detection</h1>
+    
+    <div class="error-log">
+        <h3>Error Log</h3>
+        <div id="error-output">No errors detected yet...</div>
+    </div>
+    
+    <h3>Testing Chart</h3>
+    <iframe id="test-iframe" src="/decile-calculator-svg-demo.html?ubiAmount=24&taxPercentage=30&exemptionAmount=24"></iframe>
+    
+    <script>
+        const errorOutput = document.getElementById('error-output');
+        const testIframe = document.getElementById('test-iframe');
+        let errorCount = 0;
+        
+        function logMessage(message, type = 'info') {
+            errorCount++;
+            const timestamp = new Date().toLocaleTimeString();
+            const div = document.createElement('div');
+            div.className = type;
+            div.textContent = `[${timestamp}] ${message}`;
+            
+            if (errorOutput.textContent === 'No errors detected yet...') {
+                errorOutput.textContent = '';
+            }
+            errorOutput.appendChild(div);
+        }
+        
+        // Capture global errors
+        window.addEventListener('error', (event) => {
+            logMessage(`Global Error: ${event.message} at ${event.filename}:${event.lineno}`, 'error');
+        });
+        
+        // Capture unhandled promise rejections
+        window.addEventListener('unhandledrejection', (event) => {
+            logMessage(`Unhandled Promise Rejection: ${event.reason}`, 'error');
+        });
+        
+        // Test iframe loading
+        testIframe.addEventListener('load', () => {
+            logMessage('Iframe loaded successfully', 'info');
+            
+            // Try to access iframe and check for errors
+            setTimeout(() => {
+                try {
+                    const iframeDoc = testIframe.contentDocument;
+                    const iframeWindow = testIframe.contentWindow;
+                    
+                    // Check if our classes exist
+                    if (iframeWindow.parameterManager) {
+                        logMessage('✅ ParameterManager instance found', 'info');
+                    } else {
+                        logMessage('❌ ParameterManager instance not found', 'error');
+                    }
+                    
+                    if (iframeWindow.taxCalculator) {
+                        logMessage('✅ TaxCalculator instance found', 'info');
+                    } else {
+                        logMessage('❌ TaxCalculator instance not found', 'error');
+                    }
+                    
+                    // Check if chart exists
+                    const incomeChart = iframeDoc.getElementById('incomeChart');
+                    if (incomeChart) {
+                        const rects = incomeChart.querySelectorAll('rect');
+                        logMessage(`✅ Chart found with ${rects.length} rectangles`, 'info');
+                        
+                        // Check for specific bar types
+                        const incomeBars = incomeChart.querySelectorAll('.income-bar');
+                        const ubiBars = incomeChart.querySelectorAll('.ubi-bar');
+                        const afterTaxNewBars = incomeChart.querySelectorAll('.after-tax-new-bar');
+                        const afterTaxOldBars = incomeChart.querySelectorAll('.after-tax-old-bar');
+                        
+                        logMessage(`Bar counts: ${incomeBars.length} income, ${ubiBars.length} UBI, ${afterTaxOldBars.length} old, ${afterTaxNewBars.length} new`, 'info');
+                        
+                        if (incomeBars.length === 10 && ubiBars.length === 10 && afterTaxNewBars.length === 10 && afterTaxOldBars.length === 10) {
+                            logMessage('✅ Multi-bar structure is working correctly!', 'info');
+                        } else {
+                            logMessage('⚠️ Multi-bar structure may have issues', 'warning');
+                        }
+                    } else {
+                        logMessage('❌ Income chart element not found', 'error');
+                    }
+                    
+                    // Listen for errors in the iframe
+                    iframeWindow.addEventListener('error', (event) => {
+                        logMessage(`Iframe Error: ${event.message} at ${event.filename}:${event.lineno}`, 'error');
+                    });
+                    
+                } catch (e) {
+                    logMessage(`Error accessing iframe: ${e.message}`, 'error');
+                }
+            }, 3000);
+        });
+        
+        testIframe.addEventListener('error', () => {
+            logMessage('Iframe failed to load', 'error');
+        });
+        
+        // Summary after 10 seconds
+        setTimeout(() => {
+            if (errorCount === 0) {
+                logMessage('🎉 No errors detected! Chart appears to be working correctly.', 'info');
+            } else {
+                logMessage(`⚠️ Detected ${errorCount} issues that may need attention.`, 'warning');
+            }
+        }, 10000);
+    </script>
+</body>
+</html>

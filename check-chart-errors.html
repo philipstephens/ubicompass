@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chart Error Checker</title>
+</head>
+<body>
+    <h1>Chart Error Checker</h1>
+    <div id="error-output"></div>
+    <iframe id="chart-frame" src="/decile-calculator-svg-demo.html" width="100%" height="600" style="border: 1px solid #ccc;"></iframe>
+    
+    <script>
+        const errorOutput = document.getElementById('error-output');
+        const chartFrame = document.getElementById('chart-frame');
+        
+        // Capture any JavaScript errors
+        window.addEventListener('error', (event) => {
+            errorOutput.innerHTML += `<p style="color: red;">❌ Error: ${event.message} at ${event.filename}:${event.lineno}</p>`;
+        });
+        
+        // Check iframe load
+        chartFrame.addEventListener('load', () => {
+            errorOutput.innerHTML += '<p style="color: green;">✅ Chart iframe loaded successfully</p>';
+            
+            // Try to access iframe content (if same origin)
+            try {
+                const iframeDoc = chartFrame.contentDocument || chartFrame.contentWindow.document;
+                const svgElements = iframeDoc.querySelectorAll('svg');
+                errorOutput.innerHTML += `<p style="color: green;">✅ Found ${svgElements.length} SVG elements in chart</p>`;
+                
+                // Check for our specific chart
+                const incomeChart = iframeDoc.getElementById('incomeChart');
+                if (incomeChart) {
+                    errorOutput.innerHTML += '<p style="color: green;">✅ Income chart element found</p>';
+                    const rects = incomeChart.querySelectorAll('rect');
+                    errorOutput.innerHTML += `<p style="color: green;">✅ Found ${rects.length} rectangles in income chart</p>`;
+                } else {
+                    errorOutput.innerHTML += '<p style="color: red;">❌ Income chart element NOT found</p>';
+                }
+                
+            } catch (e) {
+                errorOutput.innerHTML += `<p style="color: orange;">⚠️ Cannot access iframe content: ${e.message}</p>`;
+            }
+        });
+        
+        chartFrame.addEventListener('error', () => {
+            errorOutput.innerHTML += '<p style="color: red;">❌ Chart iframe failed to load</p>';
+        });
+    </script>
+</body>
+</html>

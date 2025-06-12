@@ -41,14 +41,27 @@ export const IframeChart = component$(
     // Prepare data for the iframe - using $() to make it serializable
     const prepareChartData = $(() => {
       // Convert tax entries to a format the iframe can use
-      const chartData = taxEntries.map((entry) => ({
-        decile: "decile" in entry ? entry.decile : 0,
-        averageTaxableIncome: entry.averagetaxableincome || 0,
-        incomeWithUBI: calculateIncomeWithUBI(entry) || 0,
-        lowerBound: entry.lowerBound || 0,
-        upperBound: entry.upperBound || 0,
-      }));
+      const chartData = taxEntries.map((entry) => {
+        // Log the entry for debugging
+        console.log("Processing entry for chart:", entry);
 
+        // Check if entry has decile property
+        const decile = "decile" in entry ? (entry as any).decile : 0;
+        const lowerBound =
+          "lowerBound" in entry ? (entry as any).lowerBound : 0;
+        const upperBound =
+          "upperBound" in entry ? (entry as any).upperBound : 0;
+
+        return {
+          decile: decile,
+          averageTaxableIncome: entry.averagetaxableincome || 0,
+          incomeWithUBI: calculateIncomeWithUBI(entry) || 0,
+          lowerBound: lowerBound,
+          upperBound: upperBound,
+        };
+      });
+
+      console.log("Prepared chart data:", chartData);
       return { taxEntries: chartData };
     });
 

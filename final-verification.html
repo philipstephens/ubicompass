@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Final Chart Verification</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .status { padding: 15px; margin: 10px 0; border-radius: 5px; font-weight: bold; }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .warning { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        iframe { width: 100%; height: 600px; border: 2px solid #007bff; margin: 10px 0; border-radius: 5px; }
+        .test-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0; }
+        .test-item { border: 1px solid #ddd; padding: 15px; border-radius: 5px; }
+        .test-item h3 { margin-top: 0; color: #333; }
+        .result-summary { background: #f8f9fa; padding: 20px; border-radius: 5px; margin: 20px 0; }
+        .chart-features { background: #e9ecef; padding: 15px; border-radius: 5px; margin: 10px 0; }
+        .feature-list { list-style-type: none; padding: 0; }
+        .feature-list li { padding: 5px 0; }
+        .feature-list li:before { content: "✓ "; color: #28a745; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>🎯 Final Chart Verification</h1>
+    
+    <div class="result-summary">
+        <h2>Expected Multi-Bar Chart Features</h2>
+        <div class="chart-features">
+            <ul class="feature-list">
+                <li><strong>Bar 1 (Stacked):</strong> Before-tax income (blue) + UBI amount (green) stacked on top</li>
+                <li><strong>Bar 2:</strong> After-tax income using old calculation (purple)</li>
+                <li><strong>Bar 3:</strong> After-tax income using new calculation (orange)</li>
+                <li><strong>Legend:</strong> Shows all 4 components with correct colors</li>
+                <li><strong>Break-even Line:</strong> Horizontal dashed line showing where UBI = taxes paid</li>
+                <li><strong>Value Labels:</strong> Dollar amounts displayed above each bar</li>
+                <li><strong>10 Deciles:</strong> Each decile should show all 3 bars (40 total bars)</li>
+            </ul>
+        </div>
+    </div>
+    
+    <div id="overall-result" class="status info">🔍 Testing in progress...</div>
+    
+    <div class="test-grid">
+        <div class="test-item">
+            <h3>📊 Direct Chart Test</h3>
+            <iframe id="direct-chart" src="/decile-calculator-svg-demo.html?ubiAmount=24&taxPercentage=30&exemptionAmount=24"></iframe>
+            <div id="direct-result" class="status info">Loading...</div>
+        </div>
+        
+        <div class="test-item">
+            <h3>🖥️ Standalone App Test</h3>
+            <iframe id="standalone-app" src="/standalone-app.html"></iframe>
+            <div id="standalone-result" class="status info">Loading...</div>
+        </div>
+    </div>
+    
+    <div id="detailed-analysis"></div>
+    
+    <script>
+        const overallResult = document.getElementById('overall-result');
+        const directResult = document.getElementById('direct-result');
+        const standaloneResult = document.getElementById('standalone-result');
+        const detailedAnalysis = document.getElementById('detailed-analysis');
+        const directChart = document.getElementById('direct-chart');
+        const standaloneApp = document.getElementById('standalone-app');
+        
+        let directSuccess = false;
+        let standaloneSuccess = false;
+        let testDetails = [];
+        
+        function addDetail(message) {
+            testDetails.push(`${new Date().toLocaleTimeString()}: ${message}`);
+            updateDetailedAnalysis();
+        }
+        
+        function updateDetailedAnalysis() {
+            detailedAnalysis.innerHTML = `
+                <div class="result-summary">
+                    <h3>📋 Detailed Test Results</h3>
+                    ${testDetails.map(detail => `<div style="margin: 5px 0; font-family: monospace;">${detail}</div>`).join('')}
+                </div>
+            `;
+        }
+        
+        function updateOverallResult() {
+            if (directSuccess && standaloneSuccess) {
+                overallResult.className = 'status success';
+                overallResult.innerHTML = '🎉 <strong>SUCCESS!</strong> Multi-bar chart is working perfectly in both contexts. Ready for Phase 2 refactoring!';
+            } else if (directSuccess || standaloneSuccess) {
+                overallResult.className = 'status warning';
+                overallResult.innerHTML = '⚠️ <strong>PARTIAL SUCCESS</strong> - Some functionality working. May need minor fixes before continuing.';
+            } else {
+                overallResult.className = 'status error';
+                overallResult.innerHTML = '❌ <strong>ISSUES DETECTED</strong> - Chart not rendering properly. Need to fix before refactoring.';
+            }
+        }
+        
+        // Test direct chart
+        directChart.addEventListener('load', () => {
+            addDetail('Direct chart iframe loaded');
+            
+            setTimeout(() => {
+                try {
+                    const iframeDoc = directChart.contentDocument;
+                    const incomeChart = iframeDoc.getElementById('incomeChart');
+                    
+                    if (incomeChart) {
+                        const allRects = incomeChart.querySelectorAll('rect');
+                        const incomeBars = incomeChart.querySelectorAll('.income-bar');
+                        const ubiBars = incomeChart.querySelectorAll('.ubi-bar');
+                        const afterTaxOldBars = incomeChart.querySelectorAll('.after-tax-old-bar');
+                        const afterTaxNewBars = incomeChart.querySelectorAll('.after-tax-new-bar');
+                        
+                        addDetail(`Direct chart bars: ${allRects.length} total, ${incomeBars.length} income, ${ubiBars.length} UBI, ${afterTaxOldBars.length} old, ${afterTaxNewBars.length} new`);
+                        
+                        // Check for perfect multi-bar structure
+                        if (allRects.length >= 40 && incomeBars.length === 10 && ubiBars.length === 10 && 
+                            afterTaxOldBars.length === 10 && afterTaxNewBars.length === 10) {
+                            directSuccess = true;
+                            directResult.className = 'status success';
+                            directResult.innerHTML = '✅ <strong>PERFECT!</strong> Multi-bar chart working correctly';
+                            addDetail('✅ Direct chart: Perfect multi-bar structure detected');
+                        } else if (allRects.length > 0) {
+                            directResult.className = 'status warning';
+                            directResult.innerHTML = '⚠️ <strong>PARTIAL</strong> Chart rendering but structure may be incomplete';
+                            addDetail('⚠️ Direct chart: Partial rendering detected');
+                        } else {
+                            directResult.className = 'status error';
+                            directResult.innerHTML = '❌ <strong>FAILED</strong> No bars rendered';
+                            addDetail('❌ Direct chart: No bars found');
+                        }
+                        
+                        // Check legend
+                        const legendItems = iframeDoc.querySelectorAll('.legend-item span');
+                        const legendTexts = Array.from(legendItems).map(span => span.textContent);
+                        const expectedLegends = ['Before-Tax Income', 'UBI Amount', 'After-Tax Income (Old)', 'After-Tax Income (New)'];
+                        const foundLegends = expectedLegends.filter(legend => 
+                            legendTexts.some(text => text.includes(legend))
+                        );
+                        addDetail(`Legend check: ${foundLegends.length}/${expectedLegends.length} expected items found`);
+                        
+                    } else {
+                        directResult.className = 'status error';
+                        directResult.innerHTML = '❌ <strong>ERROR</strong> Chart element not found';
+                        addDetail('❌ Direct chart: SVG element not found');
+                    }
+                } catch (e) {
+                    directResult.className = 'status error';
+                    directResult.innerHTML = `❌ <strong>ERROR</strong> ${e.message}`;
+                    addDetail(`❌ Direct chart error: ${e.message}`);
+                }
+                updateOverallResult();
+            }, 4000); // Wait 4 seconds for full rendering
+        });
+        
+        // Test standalone app
+        standaloneApp.addEventListener('load', () => {
+            addDetail('Standalone app iframe loaded');
+            
+            setTimeout(() => {
+                try {
+                    const iframeDoc = standaloneApp.contentDocument;
+                    const decileIframe = iframeDoc.getElementById('decileIframe');
+                    
+                    if (decileIframe) {
+                        addDetail('Found nested decile iframe in standalone app');
+                        
+                        setTimeout(() => {
+                            try {
+                                const nestedDoc = decileIframe.contentDocument;
+                                const incomeChart = nestedDoc.getElementById('incomeChart');
+                                
+                                if (incomeChart) {
+                                    const allRects = incomeChart.querySelectorAll('rect');
+                                    addDetail(`Standalone app chart: ${allRects.length} bars found`);
+                                    
+                                    if (allRects.length >= 40) {
+                                        standaloneSuccess = true;
+                                        standaloneResult.className = 'status success';
+                                        standaloneResult.innerHTML = '✅ <strong>SUCCESS!</strong> Standalone app chart working';
+                                        addDetail('✅ Standalone app: Chart working correctly');
+                                    } else if (allRects.length > 0) {
+                                        standaloneResult.className = 'status warning';
+                                        standaloneResult.innerHTML = '⚠️ <strong>PARTIAL</strong> Some bars rendered';
+                                        addDetail('⚠️ Standalone app: Partial rendering');
+                                    } else {
+                                        standaloneResult.className = 'status error';
+                                        standaloneResult.innerHTML = '❌ <strong>FAILED</strong> No bars in nested chart';
+                                        addDetail('❌ Standalone app: No bars in nested chart');
+                                    }
+                                } else {
+                                    standaloneResult.className = 'status error';
+                                    standaloneResult.innerHTML = '❌ <strong>ERROR</strong> Nested chart not found';
+                                    addDetail('❌ Standalone app: Nested chart element not found');
+                                }
+                            } catch (e) {
+                                standaloneResult.className = 'status error';
+                                standaloneResult.innerHTML = `❌ <strong>ERROR</strong> Nested access failed`;
+                                addDetail(`❌ Standalone app nested error: ${e.message}`);
+                            }
+                            updateOverallResult();
+                        }, 3000); // Wait for nested iframe
+                    } else {
+                        standaloneResult.className = 'status error';
+                        standaloneResult.innerHTML = '❌ <strong>ERROR</strong> Decile iframe not found';
+                        addDetail('❌ Standalone app: Decile iframe not found');
+                        updateOverallResult();
+                    }
+                } catch (e) {
+                    standaloneResult.className = 'status error';
+                    standaloneResult.innerHTML = `❌ <strong>ERROR</strong> ${e.message}`;
+                    addDetail(`❌ Standalone app error: ${e.message}`);
+                    updateOverallResult();
+                }
+            }, 3000);
+        });
+        
+        // Timeout fallback
+        setTimeout(() => {
+            if (!directSuccess && !standaloneSuccess) {
+                addDetail('⏰ Test timeout reached - may need manual verification');
+                updateOverallResult();
+            }
+        }, 15000);
+    </script>
+</body>
+</html>

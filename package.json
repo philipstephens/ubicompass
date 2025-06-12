@@ -29,6 +29,7 @@
     "@types/node": "20.14.11",
     "@typescript-eslint/eslint-plugin": "7.16.1",
     "@typescript-eslint/parser": "7.16.1",
+    "clsx": "^2.1.1",
     "eslint": "8.57.0",
     "eslint-plugin-qwik": "^1.13.0",
     "prettier": "3.3.3",
@@ -39,6 +40,10 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.7",
+    "@types/pg": "^8.15.3",
+    "chart.js": "^4.4.9",
+    "express": "^5.1.0",
+    "pg": "^8.16.0",
     "tailwindcss": "^4.1.7"
   }
 }

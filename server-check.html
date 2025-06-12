@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Server Status Check</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+        }
+        button {
+            background-color: #4a86e8;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        button:hover {
+            background-color: #3a76d8;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Server Status Check</h1>
+        
+        <div>
+            <button id="checkServer">Check Server Status</button>
+            <button id="openApp">Open App</button>
+            <button id="killServer">Kill Server</button>
+            <button id="startServer">Start Server</button>
+        </div>
+        
+        <div class="result" id="result">Results will appear here...</div>
+    </div>
+
+    <script>
+        document.getElementById('checkServer').addEventListener('click', async () => {
+            const resultElement = document.getElementById('result');
+            resultElement.textContent = 'Checking server status...';
+            
+            try {
+                const response = await fetch('http://localhost:5173');
+                if (response.ok) {
+                    resultElement.textContent = 'Server is running!';
+                } else {
+                    resultElement.textContent = `Server returned status: ${response.status} ${response.statusText}`;
+                }
+            } catch (error) {
+                resultElement.textContent = `Error: ${error.message}\n\nThe server might not be running.`;
+            }
+        });
+
+        document.getElementById('openApp').addEventListener('click', () => {
+            window.open('http://localhost:5173', '_blank');
+        });
+
+        document.getElementById('killServer').addEventListener('click', async () => {
+            const resultElement = document.getElementById('result');
+            resultElement.textContent = 'Attempting to kill server...';
+            
+            try {
+                // This is a simple approach - in a real scenario, you'd need a proper API endpoint
+                const response = await fetch('http://localhost:5173/kill-server', { method: 'POST' });
+                resultElement.textContent = 'Kill server request sent. Check if the server is still running.';
+            } catch (error) {
+                resultElement.textContent = `Error: ${error.message}\n\nCouldn't send kill request or server is already down.`;
+            }
+        });
+
+        document.getElementById('startServer').addEventListener('click', () => {
+            const resultElement = document.getElementById('result');
+            resultElement.textContent = 'Please start the server manually using one of these commands:\n\n' +
+                '1. npm run dev\n' +
+                '2. npx vite\n' +
+                '3. npx vite --mode dev\n\n' +
+                'Then click "Check Server Status" to verify.';
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple UBI Chart Inspector</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        h1 {
+            color: #4a86e8;
+        }
+        .instructions {
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .code-block {
+            background-color: #f0f0f0;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+        .button {
+            background-color: #4a86e8;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 0;
+            display: inline-block;
+        }
+        .button:hover {
+            background-color: #3a76d8;
+        }
+        .note {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+        .step {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Simple UBI Chart Inspector</h1>
+    
+    <div class="instructions">
+        <h2>How to Use This Tool</h2>
+        <p>This tool helps you inspect the UBI Chart component to verify it's working correctly.</p>
+        
+        <div class="step">
+            <h3>Step 1: Open the UBI Calculator</h3>
+            <p>Make sure the UBI Calculator is running at: <a href="http://localhost:5173" target="_blank">http://localhost:5173</a></p>
+        </div>
+        
+        <div class="step">
+            <h3>Step 2: Open the Browser Console</h3>
+            <p>Open your browser's developer tools by pressing:</p>
+            <ul>
+                <li><strong>Chrome/Edge:</strong> F12 or Ctrl+Shift+J</li>
+                <li><strong>Firefox:</strong> F12 or Ctrl+Shift+K</li>
+                <li><strong>Safari:</strong> Cmd+Option+C</li>
+            </ul>
+            <p>Then click on the "Console" tab.</p>
+        </div>
+        
+        <div class="step">
+            <h3>Step 3: Copy and Paste the Script</h3>
+            <p>Copy the entire script below:</p>
+            <button id="copyButton" class="button">Copy Script to Clipboard</button>
+            <div class="code-block" id="scriptCode">// Simple Chart Inspector
+// Copy this entire script and paste it into your browser console
+// while viewing the UBI Calculator
+
+(function() {
+  console.clear();
+  console.log('📊 UBI Chart Inspector Running...');
+  
+  // Find the chart component
+  const purpleHeaders = [...document.querySelectorAll('div[style*="backgroundColor: \\"#673ab7\\""]')];
+  let chartComponent = null;
+  
+  if (purpleHeaders.length > 0) {
+    chartComponent = purpleHeaders[0].closest('div[style*="borderRadius"]');
+    console.log('✅ Found chart component via purple header');
+  } else {
+    console.error('❌ Chart component not found!');
+    return;
+  }
+  
+  // Scroll to the component
+  const rect = chartComponent.getBoundingClientRect();
+  const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+  const targetPosition = rect.top + scrollTop - 100;
+  
+  window.scrollTo({
+    top: targetPosition,
+    behavior: 'smooth'
+  });
+  
+  // Highlight the component
+  const originalOutline = chartComponent.style.outline;
+  chartComponent.style.outline = '3px solid red';
+  setTimeout(() => {
+    chartComponent.style.outline = originalOutline;
+  }, 2000);
+  
+  // Check if we're in chart or table view
+  const chartBars = [
+    ...chartComponent.querySelectorAll('div[style*="height"][style*="%"]'),
+    ...chartComponent.querySelectorAll('div.bg-blue-500'),
+    ...chartComponent.querySelectorAll('div.bg-green-500')
+  ];
+  
+  const hasTable = chartComponent.querySelector('table') !== null;
+  const isChartView = chartBars.length > 0 && !hasTable;
+  
+  console.log(`📈 Current view: ${isChartView ? 'Chart View' : 'Table View'}`);
+  console.log(`🧮 Chart bars found: ${chartBars.length}`);
+  
+  // Find the toggle button
+  const toggleButtons = [
+    ...document.querySelectorAll('button svg[viewBox="0 0 20 20"]'),
+    ...document.querySelectorAll('button:has(svg)'),
+    ...document.querySelectorAll('span.chart-icon-container')
+  ];
+  
+  if (toggleButtons.length > 0) {
+    const toggleButton = toggleButtons[0].closest('button') || toggleButtons[0];
+    console.log('✅ Found toggle button');
+    
+    // Ask if user wants to click the toggle button
+    if (confirm('Do you want to toggle between chart and table view?')) {
+      toggleButton.click();
+      console.log('✅ Clicked toggle button');
+    }
+  } else {
+    console.log('❌ Toggle button not found');
+  }
+  
+  console.log('🏁 Chart inspection complete');
+})();</div>
+        </div>
+        
+        <div class="step">
+            <h3>Step 4: Paste and Run in Console</h3>
+            <p>Paste the script into your browser console and press Enter to run it.</p>
+            <p>The script will:</p>
+            <ul>
+                <li>Find the chart component</li>
+                <li>Scroll to it</li>
+                <li>Highlight it briefly with a red outline</li>
+                <li>Tell you if it's in chart or table view</li>
+                <li>Count the chart bars</li>
+                <li>Find the toggle button</li>
+                <li>Ask if you want to toggle between views</li>
+            </ul>
+        </div>
+    </div>
+    
+    <div class="note">
+        <h3>Troubleshooting</h3>
+        <p>If the script doesn't work:</p>
+        <ul>
+            <li>Make sure the UBI Calculator is running at http://localhost:5173</li>
+            <li>Check that JavaScript is enabled in your browser</li>
+            <li>Try refreshing the page before running the script</li>
+            <li>Check the browser console for any errors</li>
+        </ul>
+    </div>
+    
+    <script>
+        document.getElementById('copyButton').addEventListener('click', function() {
+            const scriptText = document.getElementById('scriptCode').innerText;
+            navigator.clipboard.writeText(scriptText)
+                .then(() => {
+                    alert('Script copied to clipboard! Now paste it into your browser console while viewing the UBI Calculator.');
+                })
+                .catch(err => {
+                    console.error('Failed to copy: ', err);
+                    alert('Failed to copy. Please select and copy the script manually.');
+                });
+        });
+    </script>
+</body>
+</html>

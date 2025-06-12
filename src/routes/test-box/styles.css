@@ -1,0 +1,14 @@
+/* Ensure rounded corners are visible */
+.rounded-3xl {
+  border-radius: 1.5rem;
+}
+
+/* Add some extra styling for the header */
+.bg-purple-500 {
+  background-color: #8b5cf6;
+}
+
+/* Add shadow */
+.shadow-md {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}

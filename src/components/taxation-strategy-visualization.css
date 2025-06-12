@@ -1,0 +1,128 @@
+.taxation-strategy-visualization {
+  background-color: #f8f9fa;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  margin-top: 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.strategy-name {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #2d3748;
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+}
+
+.strategy-description {
+  font-size: 0.9rem;
+  color: #4a5568;
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  font-style: italic;
+}
+
+.visualization-container {
+  margin-bottom: 1.5rem;
+}
+
+.visualization-header {
+  display: grid;
+  grid-template-columns: 100px 1fr 100px;
+  gap: 1rem;
+  font-weight: 600;
+  color: #2d3748;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #e2e8f0;
+  margin-bottom: 0.5rem;
+}
+
+.visualization-body {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.visualization-row {
+  display: grid;
+  grid-template-columns: 100px 1fr 100px;
+  gap: 1rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #f0f0f0;
+  align-items: center;
+}
+
+.visualization-row:hover {
+  background-color: #f7fafc;
+}
+
+.income-level {
+  font-weight: 500;
+  color: #2d3748;
+}
+
+.tax-rate-bar-container {
+  position: relative;
+  height: 1.5rem;
+  background-color: #edf2f7;
+  border-radius: 0.25rem;
+  overflow: hidden;
+}
+
+.tax-rate-bar {
+  height: 100%;
+  transition: width 0.3s ease;
+}
+
+.tax-rate-value {
+  position: absolute;
+  left: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #2d3748;
+  text-shadow: 0 0 2px rgba(255, 255, 255, 0.8);
+}
+
+.tax-amount {
+  font-weight: 500;
+  color: #2d3748;
+  text-align: right;
+}
+
+.strategy-summary {
+  background-color: #f7fafc;
+  padding: 1rem;
+  border-radius: 0.25rem;
+  border-left: 3px solid #a0aec0;
+}
+
+.strategy-summary h4 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  color: #2d3748;
+}
+
+.strategy-summary ul {
+  margin: 0;
+  padding-left: 1.5rem;
+}
+
+.strategy-summary li {
+  margin-bottom: 0.25rem;
+  color: #4a5568;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .visualization-header,
+  .visualization-row {
+    grid-template-columns: 80px 1fr 80px;
+    gap: 0.5rem;
+  }
+  
+  .tax-rate-value {
+    font-size: 0.7rem;
+  }
+}

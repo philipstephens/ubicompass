@@ -1,6 +1,6 @@
 import { createContextId } from "@builder.io/qwik";
 import type { Signal, QRL } from "@builder.io/qwik";
-import type { YearMetaData, TaxEntry } from "../components/ubi-calculation-component";
+import type { YearMetaData, TaxEntry } from "../models/income-data";
 import type { TaxationModel, TaxationModelData } from "../models/taxation";
 
 /**
@@ -16,6 +16,10 @@ export interface UbiDataStore {
   // Selection state
   selectedYearId: string;
   selectedModelId: number;
+  selectedExemptionAmount: number;
+
+  // Language settings
+  language: string;
 
   // UI state
   isLoading: boolean;
@@ -50,6 +54,10 @@ export function createInitialUbiDataState(): UbiDataStore {
     // Selection state
     selectedYearId: "",
     selectedModelId: 1, // Default to Flat Tax
+    selectedExemptionAmount: 24, // Default exemption amount
+
+    // Language settings
+    language: "en", // Default to English
 
     // UI state
     isLoading: true,

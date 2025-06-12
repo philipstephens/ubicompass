@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chart Debug Test</title>
+</head>
+<body>
+    <h1>Chart Debug Test</h1>
+    <div id="debug-output"></div>
+    
+    <script>
+        // Test if the decile calculator page loads without errors
+        async function testChart() {
+            const debugOutput = document.getElementById('debug-output');
+            
+            try {
+                // Try to fetch the decile calculator page
+                const response = await fetch('/decile-calculator-svg-demo.html');
+                const text = await response.text();
+                
+                debugOutput.innerHTML += '<p>✅ Page fetched successfully</p>';
+                
+                // Check if the page contains our new function
+                if (text.includes('calculateAfterTaxIncomeNew')) {
+                    debugOutput.innerHTML += '<p>✅ New function found in page</p>';
+                } else {
+                    debugOutput.innerHTML += '<p>❌ New function NOT found in page</p>';
+                }
+                
+                // Check if the page contains the new legend items
+                if (text.includes('Before-Tax Income') && text.includes('After-Tax Income (New)')) {
+                    debugOutput.innerHTML += '<p>✅ New legend items found</p>';
+                } else {
+                    debugOutput.innerHTML += '<p>❌ New legend items NOT found</p>';
+                }
+                
+                // Check if the page contains the new CSS classes
+                if (text.includes('after-tax-new-bar') && text.includes('after-tax-old-bar')) {
+                    debugOutput.innerHTML += '<p>✅ New CSS classes found</p>';
+                } else {
+                    debugOutput.innerHTML += '<p>❌ New CSS classes NOT found</p>';
+                }
+                
+            } catch (error) {
+                debugOutput.innerHTML += `<p>❌ Error: ${error.message}</p>`;
+            }
+        }
+        
+        // Run the test when page loads
+        window.addEventListener('load', testChart);
+    </script>
+</body>
+</html>

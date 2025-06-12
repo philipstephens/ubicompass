@@ -22,7 +22,16 @@ errorOnDuplicatesPkgDeps(devDependencies, dependencies);
  */
 export default defineConfig(({ command, mode }): UserConfig => {
   return {
-    plugins: [qwikCity(), qwikVite(), tsconfigPaths()],
+    plugins: [
+      qwikCity({
+        // Configure static file handling
+        staticGenerate: {
+          // Allow static files to be served directly
+        }
+      }),
+      qwikVite(),
+      tsconfigPaths()
+    ],
     // This tells Vite which dependencies to pre-build in dev mode.
     optimizeDeps: {
       // Put problematic deps that break bundling here, mostly those with binaries.
@@ -52,6 +61,11 @@ export default defineConfig(({ command, mode }): UserConfig => {
         // Don't cache the server response in dev mode
         "Cache-Control": "public, max-age=0",
       },
+      middlewareMode: false,
+      fs: {
+        // Allow serving files from public directory
+        allow: ['..']
+      }
     },
     preview: {
       headers: {

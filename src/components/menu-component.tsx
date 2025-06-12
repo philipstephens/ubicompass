@@ -39,17 +39,18 @@ export const MenuComponent = component$((props: MenuComponentProps) => {
       }}
     >
       <nav class="menu-nav">
-        <a href="#" class="menu-link" style={{ color: textColor }}>
+        <a href="/" class="menu-link" style={{ color: textColor }}>
           <TranslatableText text="Home" />
         </a>
-        <a href="#" class="menu-link" style={{ color: textColor }}>
-          <TranslatableText text="About" />
+        <a href="/simple" class="menu-link" style={{ color: textColor }}>
+          <TranslatableText text="Simple Version" />
         </a>
-        <a href="#" class="menu-link" style={{ color: textColor }}>
-          <TranslatableText text="Services" />
-        </a>
-        <a href="#" class="menu-link" style={{ color: textColor }}>
-          <TranslatableText text="Contact" />
+        <a
+          href="/standalone-app.html"
+          class="menu-link"
+          style={{ color: textColor }}
+        >
+          <TranslatableText text="SVG Charts" />
         </a>
 
         {/* Language Selector */}

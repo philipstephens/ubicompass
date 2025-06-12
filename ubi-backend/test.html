@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        button {
+            padding: 10px;
+            margin: 10px 0;
+            cursor: pointer;
+        }
+        pre {
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>API Test</h1>
+    
+    <button id="testServer">Test Server (Port 8001)</button>
+    <button id="mainServer">Main Server (Port 8000)</button>
+    
+    <h2>Results:</h2>
+    <pre id="results">Click a button to test the API</pre>
+    
+    <script>
+        document.getElementById('testServer').addEventListener('click', async () => {
+            const resultsElement = document.getElementById('results');
+            resultsElement.textContent = 'Testing connection to test server...';
+            
+            try {
+                const response = await fetch('http://localhost:8001/api/test');
+                const data = await response.json();
+                resultsElement.textContent = 'Success! Response:\n' + JSON.stringify(data, null, 2);
+            } catch (error) {
+                resultsElement.textContent = 'Error: ' + error.message;
+                console.error('Test server error:', error);
+            }
+        });
+        
+        document.getElementById('mainServer').addEventListener('click', async () => {
+            const resultsElement = document.getElementById('results');
+            resultsElement.textContent = 'Testing connection to main server...';
+            
+            try {
+                const response = await fetch('http://localhost:8000/api/year-meta-data');
+                const data = await response.json();
+                resultsElement.textContent = 'Success! Response:\n' + JSON.stringify(data, null, 2);
+            } catch (error) {
+                resultsElement.textContent = 'Error: ' + error.message;
+                console.error('Main server error:', error);
+            }
+        });
+    </script>
+</body>
+</html>

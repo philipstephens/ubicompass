@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>One Bar Debug</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .debug { background: #f8f9fa; padding: 15px; margin: 10px 0; border-radius: 5px; border: 1px solid #dee2e6; }
+        .error { background: #f8d7da; color: #721c24; }
+        .success { background: #d4edda; color: #155724; }
+        .warning { background: #fff3cd; color: #856404; }
+        iframe { width: 100%; height: 600px; border: 1px solid #ccc; margin: 10px 0; }
+        table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 11px; }
+        th, td { border: 1px solid #ddd; padding: 3px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .same-position { background-color: #ffebee; }
+    </style>
+</head>
+<body>
+    <h1>🔍 One Bar Per Decile Debug</h1>
+    
+    <div class="debug warning">
+        <h3>Investigating Why Only One Bar Shows Per Decile</h3>
+        <p>Possible causes:</p>
+        <ul>
+            <li>Bars are positioned on top of each other (same X coordinates)</li>
+            <li>Some bars have zero width or height</li>
+            <li>Bars are positioned outside the visible area</li>
+            <li>Only one type of bar is actually being created</li>
+            <li>CSS styling is hiding some bars</li>
+        </ul>
+    </div>
+    
+    <div id="debug-output"></div>
+    
+    <iframe id="chart-iframe" src="/decile-calculator-svg-demo.html?ubiAmount=24&taxPercentage=30&exemptionAmount=24"></iframe>
+    
+    <script>
+        const debugOutput = document.getElementById('debug-output');
+        const iframe = document.getElementById('chart-iframe');
+        
+        function addDebug(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `debug ${type}`;
+            div.innerHTML = `<strong>${new Date().toLocaleTimeString()}:</strong> ${message}`;
+            debugOutput.appendChild(div);
+        }
+        
+        iframe.addEventListener('load', () => {
+            setTimeout(() => {
+                try {
+                    const iframeDoc = iframe.contentDocument;
+                    const iframeWindow = iframe.contentWindow;
+                    
+                    addDebug('Analyzing bar positioning...', 'info');
+                    
+                    const incomeChart = iframeDoc.getElementById('incomeChart');
+                    if (!incomeChart) {
+                        addDebug('❌ Income chart not found', 'error');
+                        return;
+                    }
+                    
+                    // Get all rectangles
+                    const allRects = incomeChart.querySelectorAll('rect');
+                    addDebug(`Total rectangles found: ${allRects.length}`, 'info');
+                    
+                    // Group bars by approximate X position (decile)
+                    const barsByDecile = {};
+                    
+                    allRects.forEach((rect, index) => {
+                        const x = parseFloat(rect.getAttribute('x'));
+                        const y = parseFloat(rect.getAttribute('y'));
+                        const width = parseFloat(rect.getAttribute('width'));
+                        const height = parseFloat(rect.getAttribute('height'));
+                        const className = rect.getAttribute('class') || 'no-class';
+                        
+                        // Group by approximate decile (every ~100 pixels)
+                        const decileGroup = Math.floor(x / 100);
+                        
+                        if (!barsByDecile[decileGroup]) {
+                            barsByDecile[decileGroup] = [];
+                        }
+                        
+                        barsByDecile[decileGroup].push({
+                            index,
+                            x,
+                            y,
+                            width,
+                            height,
+                            className,
+                            visible: width > 0 && height > 0 && x >= 0 && y >= 0
+                        });
+                    });
+                    
+                    // Analyze each decile group
+                    let tableHTML = `
+                        <table>
+                            <tr>
+                                <th>Decile Group</th>
+                                <th>Bar Count</th>
+                                <th>Bar Details</th>
+                                <th>Position Issues</th>
+                            </tr>
+                    `;
+                    
+                    Object.keys(barsByDecile).sort((a, b) => parseInt(a) - parseInt(b)).forEach(decileGroup => {
+                        const bars = barsByDecile[decileGroup];
+                        const visibleBars = bars.filter(bar => bar.visible);
+                        
+                        // Check for position overlaps
+                        const xPositions = bars.map(bar => Math.round(bar.x));
+                        const uniqueXPositions = [...new Set(xPositions)];
+                        const hasOverlaps = uniqueXPositions.length < xPositions.length;
+                        
+                        // Create bar details
+                        const barDetails = bars.map(bar => 
+                            `${bar.className}: x=${Math.round(bar.x)}, h=${Math.round(bar.height)}`
+                        ).join('<br>');
+                        
+                        // Identify issues
+                        const issues = [];
+                        if (hasOverlaps) issues.push('❌ Overlapping X positions');
+                        if (visibleBars.length < bars.length) issues.push('❌ Some bars not visible');
+                        if (bars.length < 3) issues.push('❌ Missing bars (expected 4: 2 stacked + 2 after-tax)');
+                        if (issues.length === 0) issues.push('✅ No obvious issues');
+                        
+                        const rowClass = issues.some(issue => issue.includes('❌')) ? 'same-position' : '';
+                        
+                        tableHTML += `
+                            <tr class="${rowClass}">
+                                <td>Group ${decileGroup}</td>
+                                <td>${bars.length} (${visibleBars.length} visible)</td>
+                                <td style="font-size: 10px;">${barDetails}</td>
+                                <td>${issues.join('<br>')}</td>
+                            </tr>
+                        `;
+                    });
+                    
+                    tableHTML += '</table>';
+                    
+                    const analysisDiv = document.createElement('div');
+                    analysisDiv.className = 'debug info';
+                    analysisDiv.innerHTML = `
+                        <h3>📊 Bar Position Analysis</h3>
+                        ${tableHTML}
+                    `;
+                    debugOutput.appendChild(analysisDiv);
+                    
+                    // Check for specific bar types
+                    const beforeTaxBars = incomeChart.querySelectorAll('.before-tax-income-bar');
+                    const ubiBars = incomeChart.querySelectorAll('.ubi-amount-bar');
+                    const afterTaxOldBars = incomeChart.querySelectorAll('.after-tax-old-bar');
+                    const afterTaxNewBars = incomeChart.querySelectorAll('.after-tax-new-bar');
+                    
+                    addDebug(`Bar type counts:`, 'info');
+                    addDebug(`  - before-tax-income-bar: ${beforeTaxBars.length}`, beforeTaxBars.length === 10 ? 'success' : 'error');
+                    addDebug(`  - ubi-amount-bar: ${ubiBars.length}`, ubiBars.length === 10 ? 'success' : 'error');
+                    addDebug(`  - after-tax-old-bar: ${afterTaxOldBars.length}`, afterTaxOldBars.length === 10 ? 'success' : 'error');
+                    addDebug(`  - after-tax-new-bar: ${afterTaxNewBars.length}`, afterTaxNewBars.length === 10 ? 'success' : 'error');
+                    
+                    // Check if bars are actually overlapping
+                    if (afterTaxOldBars.length > 0 && afterTaxNewBars.length > 0) {
+                        addDebug('Checking first decile bar positions...', 'warning');
+                        
+                        const firstOldBar = afterTaxOldBars[0];
+                        const firstNewBar = afterTaxNewBars[0];
+                        
+                        const oldX = parseFloat(firstOldBar.getAttribute('x'));
+                        const newX = parseFloat(firstNewBar.getAttribute('x'));
+                        const barWidth = parseFloat(firstOldBar.getAttribute('width'));
+                        
+                        addDebug(`First decile after-tax bars:`, 'info');
+                        addDebug(`  - OLD bar: x=${oldX}, width=${barWidth}`, 'info');
+                        addDebug(`  - NEW bar: x=${newX}, width=${barWidth}`, 'info');
+                        addDebug(`  - Distance: ${Math.abs(newX - oldX)} pixels`, 'info');
+                        
+                        if (Math.abs(newX - oldX) < barWidth) {
+                            addDebug(`❌ OVERLAP DETECTED! Bars are overlapping`, 'error');
+                        } else {
+                            addDebug(`✅ No overlap - bars should be visible separately`, 'success');
+                        }
+                    }
+                    
+                    // Final diagnosis
+                    const totalExpected = 40; // 10 deciles × 4 bars each
+                    const totalFound = allRects.length;
+                    
+                    if (totalFound < totalExpected) {
+                        addDebug(`❌ DIAGNOSIS: Missing bars (${totalFound}/${totalExpected})`, 'error');
+                    } else if (Object.values(barsByDecile).some(bars => bars.length < 4)) {
+                        addDebug(`❌ DIAGNOSIS: Some deciles missing bars`, 'error');
+                    } else {
+                        addDebug(`⚠️ DIAGNOSIS: All bars created but positioning/visibility issue`, 'warning');
+                    }
+                    
+                } catch (e) {
+                    addDebug(`❌ Analysis error: ${e.message}`, 'error');
+                }
+            }, 3000);
+        });
+    </script>
+</body>
+</html>

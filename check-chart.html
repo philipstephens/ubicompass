@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chart Display Checker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        h1 {
+            color: #333;
+        }
+        .instructions {
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .button-container {
+            margin: 20px 0;
+        }
+        button {
+            background-color: #4a86e8;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #3a76d8;
+        }
+        #results {
+            background-color: #f0f8ff;
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 4px solid #4a86e8;
+            white-space: pre-wrap;
+            font-family: monospace;
+            min-height: 200px;
+        }
+    </style>
+</head>
+<body>
+    <h1>UBI Chart Display Checker</h1>
+    
+    <div class="instructions">
+        <p>This tool will help check if the chart is properly displayed in the UBI Calculator.</p>
+        <p>Instructions:</p>
+        <ol>
+            <li>Make sure the UBI Calculator is running at <a href="http://localhost:5173" target="_blank">http://localhost:5173</a></li>
+            <li>Click the "Check Chart Display" button below</li>
+            <li>The results will be displayed in the box below</li>
+        </ol>
+    </div>
+    
+    <div class="button-container">
+        <button id="checkButton">Check Chart Display</button>
+    </div>
+    
+    <h2>Results:</h2>
+    <div id="results">Results will appear here...</div>
+    
+    <script>
+        document.getElementById('checkButton').addEventListener('click', async function() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.textContent = 'Checking...';
+            
+            try {
+                // Open the UBI Calculator in a new window
+                const ubiWindow = window.open('http://localhost:5173', '_blank');
+                
+                if (!ubiWindow) {
+                    resultsDiv.textContent = 'Error: Popup blocked. Please allow popups and try again.';
+                    return;
+                }
+                
+                // Wait for the page to load
+                await new Promise(resolve => setTimeout(resolve, 3000));
+                
+                // Try to inject and run our script
+                try {
+                    ubiWindow.console.log = function(message) {
+                        resultsDiv.textContent += '\n' + message;
+                    };
+                    
+                    const scriptText = await fetch('check-chart-display.js').then(r => r.text());
+                    ubiWindow.eval(scriptText);
+                    
+                    resultsDiv.textContent = 'Script injected. Checking chart display...';
+                } catch (err) {
+                    resultsDiv.textContent = `Error injecting script: ${err.message}`;
+                    console.error(err);
+                }
+            } catch (err) {
+                resultsDiv.textContent = `Error: ${err.message}`;
+                console.error(err);
+            }
+        });
+    </script>
+</body>
+</html>

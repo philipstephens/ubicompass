@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Income Range Component Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+        }
+        .income-range {
+            border-radius: 24px;
+            overflow: hidden;
+            border: 1px solid #ccc;
+            background-color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+        .income-range-header {
+            background-color: blue;
+            padding: 10px 15px;
+            text-align: center;
+        }
+        .income-range-header h4 {
+            font-weight: bold;
+            font-size: 18px;
+            margin: 0;
+            color: white;
+        }
+        .income-range-content {
+            padding: 20px;
+        }
+        .tax-bracket {
+            background-color: #f0f8ff;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+        .tax-bracket-row {
+            display: flex;
+            justify-content: space-between;
+        }
+        .controls {
+            margin-bottom: 20px;
+        }
+        select, button {
+            padding: 8px 12px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            margin-right: 10px;
+        }
+        button {
+            background-color: #4a86e8;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #3a76d8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Income Range Component Demo</h1>
+        
+        <div class="controls">
+            <label for="exemptionAmount">Exemption Amount:</label>
+            <select id="exemptionAmount">
+                <option value="0">$0k (No exemption)</option>
+                <option value="12">$12k (No tax on first $12k)</option>
+                <option value="18">$18k (No tax on first $18k)</option>
+                <option value="24" selected>$24k (No tax on first $24k)</option>
+                <option value="30">$30k (No tax on first $30k)</option>
+                <option value="36">$36k (No tax on first $36k)</option>
+            </select>
+            
+            <label for="taxRate">Tax Rate:</label>
+            <select id="taxRate">
+                <option value="20">20%</option>
+                <option value="25">25%</option>
+                <option value="30" selected>30%</option>
+                <option value="35">35%</option>
+                <option value="40">40%</option>
+            </select>
+        </div>
+        
+        <div class="income-range">
+            <div class="income-range-header">
+                <h4>Income Range</h4>
+            </div>
+            <div class="income-range-content">
+                <p style="margin-bottom: 16px">
+                    <strong>Current Tax Model:</strong> Flat Tax
+                </p>
+                <p style="margin-bottom: 8px">
+                    <strong>Tax Brackets:</strong>
+                </p>
+                <div class="tax-bracket">
+                    <div class="tax-bracket-row">
+                        <span id="bracket1">$0k - $24k</span>
+                        <span style="font-weight: bold">0%</span>
+                    </div>
+                </div>
+                <div class="tax-bracket">
+                    <div class="tax-bracket-row">
+                        <span id="bracket2">$24k+</span>
+                        <span style="font-weight: bold" id="taxRateDisplay">30%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Get elements
+        const exemptionAmountSelect = document.getElementById('exemptionAmount');
+        const taxRateSelect = document.getElementById('taxRate');
+        const bracket1 = document.getElementById('bracket1');
+        const bracket2 = document.getElementById('bracket2');
+        const taxRateDisplay = document.getElementById('taxRateDisplay');
+        
+        // Update brackets when exemption amount changes
+        exemptionAmountSelect.addEventListener('change', function() {
+            const exemptionAmount = this.value;
+            bracket1.textContent = `$0k - $${exemptionAmount}k`;
+            bracket2.textContent = `$${exemptionAmount}k+`;
+        });
+        
+        // Update tax rate display when tax rate changes
+        taxRateSelect.addEventListener('change', function() {
+            const taxRate = this.value;
+            taxRateDisplay.textContent = `${taxRate}%`;
+        });
+    </script>
+</body>
+</html>

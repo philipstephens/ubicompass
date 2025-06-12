@@ -1,0 +1,52 @@
+.taxation-model-selector {
+  margin-bottom: 1.5rem;
+}
+
+.taxation-model-selector .form-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.taxation-model-selector label {
+  font-weight: 600;
+  color: #2d3748;
+  margin-right: 0.5rem;
+}
+
+.taxation-model-selector select {
+  padding: 0.5rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.25rem;
+  background-color: white;
+  color: #2d3748;
+  font-size: 1rem;
+  min-width: 200px;
+}
+
+.taxation-model-selector select:focus {
+  outline: none;
+  border-color: #4299e1;
+  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2);
+}
+
+.taxation-model-selector .model-info {
+  margin-left: 1rem;
+  font-size: 0.9rem;
+  color: #4a5568;
+  font-style: italic;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .taxation-model-selector .form-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .taxation-model-selector .model-info {
+    margin-left: 0;
+    margin-top: 0.5rem;
+  }
+}

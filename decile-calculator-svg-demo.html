@@ -1,0 +1,1018 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>UBI Decile Calculator - SVG Chart Demo</title>
+    <base href="/decile-calculator-svg-demo.html" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background-color: #f5f5f5;
+      }
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        background-color: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .card {
+        border-radius: 24px;
+        overflow: hidden;
+        border: 1px solid #d0d6f7;
+        background-color: white;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        margin-top: 20px;
+        margin-bottom: 20px;
+      }
+      .card-header {
+        background-color: #673ab7;
+        padding: 10px 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .card-title {
+        font-weight: bold;
+        font-size: 18px;
+        margin: 0;
+        color: white;
+      }
+      .card-content {
+        padding: 20px;
+      }
+      .chart-container {
+        width: 100%;
+        max-width: 1600px;
+        margin: 0 auto;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .svg-chart {
+        width: 100%;
+        height: 500px;
+        max-width: 1200px;
+      }
+      .chart-title {
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 20px;
+        text-align: center;
+      }
+      .legend {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 15px;
+        flex-wrap: wrap;
+      }
+      .legend-item {
+        display: flex;
+        align-items: center;
+        margin: 0 15px 10px 15px;
+      }
+      .legend-color {
+        width: 20px;
+        height: 20px;
+        margin-right: 10px;
+        border-radius: 4px;
+      }
+      .blue {
+        background-color: #3b82f6;
+      }
+      .green {
+        background-color: #10b981;
+      }
+      .purple {
+        background-color: #9333ea;
+      }
+      .red-dashed {
+        height: 2px;
+        background-color: transparent;
+        border-top: 2px dashed #e74c3c;
+      }
+      .footer-note {
+        margin-top: 24px;
+        padding: 16px;
+        background-color: #f8fafc;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        color: #64748b;
+      }
+      .controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        margin-bottom: 20px;
+      }
+      .control-group {
+        flex: 1;
+        min-width: 200px;
+      }
+      .view-toggle {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 20px;
+      }
+      .view-button {
+        background-color: #673ab7;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 4px;
+        cursor: pointer;
+        margin: 0 10px;
+      }
+      .view-button:hover {
+        background-color: #5e35b1;
+      }
+      .view-button.active {
+        background-color: #4527a0;
+      }
+      /* SVG Styles */
+      .axis-line {
+        stroke: #333;
+        stroke-width: 2;
+      }
+      .grid-line {
+        stroke: #ddd;
+        stroke-width: 1;
+        stroke-dasharray: 5, 5;
+      }
+      .income-bar {
+        fill: #3b82f6;
+      }
+      .ubi-bar {
+        fill: #10b981;
+      }
+      .tax-line {
+        stroke: #9333ea;
+        stroke-width: 2;
+        fill: none;
+      }
+      .tax-point {
+        fill: #9333ea;
+        r: 4;
+      }
+      .break-even-line {
+        stroke: #e74c3c;
+        stroke-width: 2;
+        stroke-dasharray: 5, 5;
+      }
+      .axis-label {
+        font-size: 12px;
+        text-anchor: middle;
+      }
+      .y-axis-label {
+        text-anchor: end;
+      }
+      .value-label {
+        font-size: 10px;
+        font-weight: bold;
+        text-anchor: middle;
+      }
+      .tax-label {
+        fill: #9333ea;
+        font-weight: bold;
+      }
+      .break-even-label {
+        fill: #e74c3c;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1 class="text-2xl font-bold mb-6">
+        UBI by Income Decile - SVG Chart Demo
+      </h1>
+
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">UBI Calculator Parameters</h2>
+        </div>
+        <div class="card-content">
+          <div class="controls">
+            <div class="control-group">
+              <label class="block mb-2 font-medium">Tax Year</label>
+              <select
+                id="taxYear"
+                class="w-full p-2 border border-gray-300 rounded"
+              >
+                <option value="2022">2022</option>
+                <option value="2023">2023</option>
+              </select>
+            </div>
+            <div class="control-group">
+              <label class="block mb-2 font-medium">UBI Amount</label>
+              <select
+                id="ubiAmount"
+                class="w-full p-2 border border-gray-300 rounded"
+              >
+                <option value="12">$12k / Year ($1.0k / month)</option>
+                <option value="18">$18k / Year ($1.5k / month)</option>
+                <option value="24" selected>$24k / Year ($2.0k / month)</option>
+                <option value="30">$30k / Year ($2.5k / month)</option>
+                <option value="36">$36k / Year ($3.0k / month)</option>
+              </select>
+            </div>
+            <div class="control-group">
+              <label class="block mb-2 font-medium"
+                >Flat Tax Percentage:
+                <span id="taxPercentageValue">30%</span></label
+              >
+              <input
+                type="range"
+                id="taxPercentage"
+                min="1"
+                max="99"
+                value="30"
+                class="w-full"
+              />
+            </div>
+            <div class="control-group">
+              <label class="block mb-2 font-medium">Exemption Amount</label>
+              <select
+                id="exemptionAmount"
+                class="w-full p-2 border border-gray-300 rounded"
+              >
+                <option value="0">$0k (No exemption)</option>
+                <option value="12">$12k (No tax on first $12k)</option>
+                <option value="18">$18k (No tax on first $18k)</option>
+                <option value="24" selected>$24k (No tax on first $24k)</option>
+                <option value="30">$30k (No tax on first $30k)</option>
+                <option value="36">$36k (No tax on first $36k)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="view-toggle">
+        <button id="incomeViewBtn" class="view-button active">
+          Income Impact
+        </button>
+        <button id="costViewBtn" class="view-button">Cost Analysis</button>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">UBI Impact by Income Decile</h2>
+        </div>
+        <div class="card-content">
+          <div id="incomeView" class="chart-container">
+            <h3 class="chart-title">Income Comparison by Decile</h3>
+
+            <div class="legend">
+              <div class="legend-item">
+                <div class="legend-color blue"></div>
+                <span>Average Taxable Income</span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-color green"></div>
+                <span>Income with UBI</span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-color purple"></div>
+                <span>Flat Tax Paid</span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-color red-dashed"></div>
+                <span style="color: #e74c3c">Break-even Point</span>
+              </div>
+            </div>
+
+            <svg id="incomeChart" class="svg-chart" viewBox="0 0 1000 500">
+              <!-- Will be populated by JavaScript -->
+            </svg>
+
+            <div class="footer-note">
+              <p>
+                * All values in the income chart are in thousands of dollars.
+              </p>
+              <p class="mt-2">
+                Each decile represents exactly 10% of the taxpayer population.
+                Deciles divide the population into ten equal groups based on
+                income level, from lowest (D1) to highest (D10).
+              </p>
+            </div>
+          </div>
+
+          <div id="costView" class="chart-container" style="display: none">
+            <h3 class="chart-title">UBI Cost Analysis by Decile</h3>
+
+            <div class="legend">
+              <div class="legend-item">
+                <div
+                  class="legend-color"
+                  style="background-color: #f59e0b"
+                ></div>
+                <span>UBI Payments</span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-color purple"></div>
+                <span>Tax Revenue</span>
+              </div>
+              <div class="legend-item">
+                <div
+                  class="legend-color"
+                  style="background-color: #ef4444"
+                ></div>
+                <span>Net Cost</span>
+              </div>
+            </div>
+
+            <svg id="costChart" class="svg-chart" viewBox="0 0 1000 500">
+              <!-- Will be populated by JavaScript -->
+            </svg>
+
+            <div class="footer-note">
+              <p>
+                * All values in the cost analysis are in billions of dollars.
+              </p>
+              <p>
+                * Each decile represents approximately 1.5 million taxpayers (15
+                million total taxpayers divided into 10 equal groups).
+              </p>
+              <p class="mt-2">
+                Each decile represents exactly 10% of the taxpayer population.
+                Deciles divide the population into ten equal groups based on
+                income level, from lowest (D1) to highest (D10).
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Mock data for deciles
+      const decileData = [
+        { decile: 1, lowerBound: 0, upperBound: 10, averageTaxableIncome: 5 },
+        { decile: 2, lowerBound: 10, upperBound: 20, averageTaxableIncome: 15 },
+        { decile: 3, lowerBound: 20, upperBound: 30, averageTaxableIncome: 25 },
+        { decile: 4, lowerBound: 30, upperBound: 40, averageTaxableIncome: 35 },
+        { decile: 5, lowerBound: 40, upperBound: 50, averageTaxableIncome: 45 },
+        { decile: 6, lowerBound: 50, upperBound: 60, averageTaxableIncome: 55 },
+        { decile: 7, lowerBound: 60, upperBound: 70, averageTaxableIncome: 65 },
+        {
+          decile: 8,
+          lowerBound: 70,
+          upperBound: 100,
+          averageTaxableIncome: 85,
+        },
+        {
+          decile: 9,
+          lowerBound: 100,
+          upperBound: 150,
+          averageTaxableIncome: 120,
+        },
+        {
+          decile: 10,
+          lowerBound: 150,
+          upperBound: 500,
+          averageTaxableIncome: 280,
+        },
+      ];
+
+      // Get DOM elements
+      const taxPercentage = document.getElementById("taxPercentage");
+      const taxPercentageValue = document.getElementById("taxPercentageValue");
+      const ubiAmount = document.getElementById("ubiAmount");
+      const exemptionAmount = document.getElementById("exemptionAmount");
+      const incomeChart = document.getElementById("incomeChart");
+      const costChart = document.getElementById("costChart");
+      const incomeView = document.getElementById("incomeView");
+      const costView = document.getElementById("costView");
+      const incomeViewBtn = document.getElementById("incomeViewBtn");
+      const costViewBtn = document.getElementById("costViewBtn");
+
+      // Current view state
+      let currentView = "income";
+
+      // Set up event listeners
+      taxPercentage.addEventListener("input", () => {
+        taxPercentageValue.textContent = `${taxPercentage.value}%`;
+        updateCharts();
+      });
+
+      ubiAmount.addEventListener("change", updateCharts);
+      exemptionAmount.addEventListener("change", updateCharts);
+
+      // View toggle event listeners
+      incomeViewBtn.addEventListener("click", () => {
+        incomeView.style.display = "block";
+        costView.style.display = "none";
+        incomeViewBtn.classList.add("active");
+        costViewBtn.classList.remove("active");
+        currentView = "income";
+      });
+
+      costViewBtn.addEventListener("click", () => {
+        incomeView.style.display = "none";
+        costView.style.display = "block";
+        costViewBtn.classList.add("active");
+        incomeViewBtn.classList.remove("active");
+        currentView = "cost";
+      });
+
+      // Get decile description
+      function getDecileDescription(decile) {
+        switch (decile) {
+          case 1:
+            return "Lowest 10%";
+          case 2:
+            return "10-20%";
+          case 3:
+            return "20-30%";
+          case 4:
+            return "30-40%";
+          case 5:
+            return "40-50%";
+          case 6:
+            return "50-60%";
+          case 7:
+            return "60-70%";
+          case 8:
+            return "70-80%";
+          case 9:
+            return "80-90%";
+          case 10:
+            return "Highest 10%";
+          default:
+            return `Decile ${decile}`;
+        }
+      }
+
+      // Calculate income with UBI
+      function calculateIncomeWithUBI(income) {
+        const ubi = parseInt(ubiAmount.value);
+        return income + ubi;
+      }
+
+      // Calculate tax paid
+      function calculateTaxPaid(income) {
+        const taxRate = parseInt(taxPercentage.value) / 100;
+        const exemptAmount = parseInt(exemptionAmount.value);
+        const taxableIncome = Math.max(0, income - exemptAmount);
+        return taxableIncome * taxRate;
+      }
+
+      // Calculate net UBI benefit (UBI amount - tax paid)
+      function calculateNetUbiBenefit(income) {
+        const ubi = parseInt(ubiAmount.value);
+        const taxWithoutUbi = calculateTaxPaid(income);
+        const taxWithUbi = calculateTaxPaid(income + ubi);
+        const additionalTax = taxWithUbi - taxWithoutUbi;
+        return ubi - additionalTax;
+      }
+
+      // Calculate break-even income (where UBI benefit equals tax paid)
+      function calculateBreakEvenIncome() {
+        const ubi = parseInt(ubiAmount.value);
+        const taxRate = parseInt(taxPercentage.value) / 100;
+        const exemptAmount = parseInt(exemptionAmount.value);
+
+        // For flat tax with exemption:
+        // Break-even occurs when: income = (UBI / taxRate) + exemptAmount - UBI
+        return ubi / taxRate + exemptAmount - ubi;
+      }
+
+      // Create SVG element with given attributes
+      function createSVGElement(type, attributes = {}) {
+        const element = document.createElementNS(
+          "http://www.w3.org/2000/svg",
+          type
+        );
+        for (const [key, value] of Object.entries(attributes)) {
+          element.setAttribute(key, value);
+        }
+        return element;
+      }
+
+      // Calculate total UBI cost and tax revenue
+      function calculateUbiCostAndRevenue() {
+        const ubi = parseInt(ubiAmount.value);
+        const taxpayersPerDecile = 1.5; // In millions (15 million taxpayers / 10 deciles)
+
+        // Calculate for each decile
+        const decileResults = decileData.map((entry) => {
+          const income = entry.averageTaxableIncome;
+          const taxWithoutUbi = calculateTaxPaid(income);
+          const taxWithUbi = calculateTaxPaid(income + ubi);
+          const ubiPayment = ubi;
+          const taxRevenue = taxWithUbi;
+          const netCost = ubiPayment - taxRevenue;
+
+          return {
+            decile: entry.decile,
+            income: income,
+            ubiPayment: ubiPayment,
+            taxRevenue: taxRevenue,
+            netCost: netCost,
+            taxpayers: taxpayersPerDecile,
+          };
+        });
+
+        // Calculate totals
+        const totalUbiCost = decileResults.reduce(
+          (sum, entry) => sum + entry.ubiPayment * entry.taxpayers,
+          0
+        );
+        const totalTaxRevenue = decileResults.reduce(
+          (sum, entry) => sum + entry.taxRevenue * entry.taxpayers,
+          0
+        );
+        const totalNetCost = totalUbiCost - totalTaxRevenue;
+
+        return {
+          decileResults: decileResults,
+          totalUbiCost: totalUbiCost,
+          totalTaxRevenue: totalTaxRevenue,
+          totalNetCost: totalNetCost,
+        };
+      }
+
+      // Update both charts
+      function updateCharts() {
+        updateIncomeChart();
+        updateCostChart();
+      }
+
+      // Update the income chart
+      function updateIncomeChart() {
+        // Clear the chart
+        incomeChart.innerHTML = "";
+
+        // Chart dimensions and margins
+        const margin = { top: 40, right: 120, bottom: 80, left: 80 };
+        const width = 1000 - margin.left - margin.right;
+        const height = 500 - margin.top - margin.bottom;
+
+        // Create chart group with margin
+        const g = createSVGElement("g", {
+          transform: `translate(${margin.left}, ${margin.top})`,
+        });
+        incomeChart.appendChild(g);
+
+        // Calculate maximum income for scaling
+        const maxIncome = Math.max(
+          ...decileData.map((entry) =>
+            Math.max(
+              entry.averageTaxableIncome,
+              calculateIncomeWithUBI(entry.averageTaxableIncome)
+            )
+          )
+        );
+
+        // Round up to nearest 50k for y-axis scale
+        const yMax = Math.ceil(maxIncome / 50) * 50;
+
+        // Calculate break-even income
+        const breakEvenIncome = calculateBreakEvenIncome();
+
+        // Calculate scales
+        const barWidth = 30;
+        const barSpacing = width / decileData.length;
+        const yScale = height / yMax;
+
+        // Draw axes
+        const xAxis = createSVGElement("line", {
+          x1: 0,
+          y1: height,
+          x2: width,
+          y2: height,
+          class: "axis-line",
+        });
+        g.appendChild(xAxis);
+
+        const yAxis = createSVGElement("line", {
+          x1: 0,
+          y1: 0,
+          x2: 0,
+          y2: height,
+          class: "axis-line",
+        });
+        g.appendChild(yAxis);
+
+        // Draw grid lines and y-axis labels
+        for (let i = 0; i <= 5; i++) {
+          const y = height - (i * height) / 5;
+          const value = (i * yMax) / 5;
+
+          // Grid line
+          const gridLine = createSVGElement("line", {
+            x1: 0,
+            y1: y,
+            x2: width,
+            y2: y,
+            class: "grid-line",
+          });
+          g.appendChild(gridLine);
+
+          // Y-axis label
+          const yLabel = createSVGElement("text", {
+            x: -10,
+            y: y + 5,
+            class: "y-axis-label",
+          });
+          yLabel.textContent = `$${value}k`;
+          g.appendChild(yLabel);
+        }
+
+        // Draw break-even line if it's within the chart range
+        if (breakEvenIncome > 0 && breakEvenIncome <= yMax) {
+          const breakEvenY = height - breakEvenIncome * yScale;
+
+          const breakEvenLine = createSVGElement("line", {
+            x1: 0,
+            y1: breakEvenY,
+            x2: width,
+            y2: breakEvenY,
+            class: "break-even-line",
+          });
+          g.appendChild(breakEvenLine);
+
+          // Break-even label
+          const breakEvenLabel = createSVGElement("text", {
+            x: width + 10,
+            y: breakEvenY + 5,
+            class: "break-even-label",
+          });
+          breakEvenLabel.textContent = `Break-even: $${Math.round(breakEvenIncome)}k`;
+          g.appendChild(breakEvenLabel);
+        }
+
+        // Calculate tax points for the line
+        const taxPoints = decileData.map((entry, index) => {
+          const income = entry.averageTaxableIncome;
+          const taxPaid = calculateTaxPaid(income);
+          const x = index * barSpacing + barSpacing / 2;
+          const y = height - taxPaid * yScale;
+          return { x, y, value: taxPaid };
+        });
+
+        // Draw tax line
+        let taxLinePath = `M ${taxPoints[0].x} ${taxPoints[0].y}`;
+        for (let i = 1; i < taxPoints.length; i++) {
+          taxLinePath += ` L ${taxPoints[i].x} ${taxPoints[i].y}`;
+        }
+
+        const taxLine = createSVGElement("path", {
+          d: taxLinePath,
+          class: "tax-line",
+        });
+        g.appendChild(taxLine);
+
+        // Draw tax points and labels
+        taxPoints.forEach((point, index) => {
+          // Draw point
+          const taxPoint = createSVGElement("circle", {
+            cx: point.x,
+            cy: point.y,
+            class: "tax-point",
+          });
+          g.appendChild(taxPoint);
+
+          // Add label to every other point to avoid crowding
+          if (index % 2 === 0) {
+            const taxLabel = createSVGElement("text", {
+              x: point.x,
+              y: point.y - 10,
+              class: "value-label tax-label",
+            });
+            taxLabel.textContent = `$${Math.round(point.value)}k`;
+            g.appendChild(taxLabel);
+          }
+        });
+
+        // Draw bars and x-axis labels for each decile
+        decileData.forEach((entry, index) => {
+          const x = index * barSpacing + barSpacing / 2;
+
+          // Calculate heights
+          const avgIncome = entry.averageTaxableIncome;
+          const incomeWithUBI = calculateIncomeWithUBI(avgIncome);
+          const avgHeight = avgIncome * yScale;
+          const ubiHeight = incomeWithUBI * yScale;
+
+          // Draw average income bar
+          const avgBar = createSVGElement("rect", {
+            x: x - barWidth - 2,
+            y: height - avgHeight,
+            width: barWidth,
+            height: avgHeight,
+            class: "income-bar",
+          });
+          g.appendChild(avgBar);
+
+          // Draw UBI income bar
+          const ubiBar = createSVGElement("rect", {
+            x: x + 2,
+            y: height - ubiHeight,
+            width: barWidth,
+            height: ubiHeight,
+            class: "ubi-bar",
+          });
+          g.appendChild(ubiBar);
+
+          // Add value labels
+          const avgLabel = createSVGElement("text", {
+            x: x - barWidth / 2 - 2,
+            y: height - avgHeight - 10,
+            class: "value-label",
+          });
+          avgLabel.textContent = `$${Math.round(avgIncome)}k`;
+          g.appendChild(avgLabel);
+
+          const ubiLabel = createSVGElement("text", {
+            x: x + barWidth / 2 + 2,
+            y: height - ubiHeight - 10,
+            class: "value-label",
+          });
+          ubiLabel.textContent = `$${Math.round(incomeWithUBI)}k`;
+          g.appendChild(ubiLabel);
+
+          // Add x-axis label
+          const decileLabel = createSVGElement("text", {
+            x: x,
+            y: height + 25,
+            class: "axis-label",
+          });
+          decileLabel.textContent = `D${entry.decile}`;
+          g.appendChild(decileLabel);
+
+          const descLabel = createSVGElement("text", {
+            x: x,
+            y: height + 45,
+            class: "axis-label",
+            "font-size": "10px",
+          });
+          descLabel.textContent = getDecileDescription(entry.decile);
+          g.appendChild(descLabel);
+        });
+
+        // Add axis titles
+        const xAxisTitle = createSVGElement("text", {
+          x: width / 2,
+          y: height + 70,
+          class: "axis-label",
+          "font-weight": "bold",
+        });
+        xAxisTitle.textContent = "Income Decile";
+        g.appendChild(xAxisTitle);
+
+        const yAxisTitle = createSVGElement("text", {
+          x: -height / 2,
+          y: -60,
+          class: "axis-label",
+          "font-weight": "bold",
+          transform: "rotate(-90)",
+        });
+        yAxisTitle.textContent = "Income (thousands)";
+        g.appendChild(yAxisTitle);
+      }
+
+      // Update the cost chart
+      function updateCostChart() {
+        // Clear the chart
+        costChart.innerHTML = "";
+
+        // Get cost and revenue data
+        const costData = calculateUbiCostAndRevenue();
+
+        // Chart dimensions and margins
+        const margin = { top: 40, right: 120, bottom: 80, left: 80 };
+        const width = 1000 - margin.left - margin.right;
+        const height = 500 - margin.top - margin.bottom;
+
+        // Create chart group with margin
+        const g = createSVGElement("g", {
+          transform: `translate(${margin.left}, ${margin.top})`,
+        });
+        costChart.appendChild(g);
+
+        // Calculate maximum value for scaling
+        const maxValue = Math.max(
+          ...costData.decileResults.map(
+            (entry) =>
+              Math.max(
+                entry.ubiPayment,
+                entry.taxRevenue,
+                Math.abs(entry.netCost)
+              ) * entry.taxpayers
+          )
+        );
+
+        // Round up to nearest 10 billion for y-axis scale
+        const yMax = Math.ceil(maxValue / 10) * 10;
+
+        // Calculate scales
+        const barWidth = 25;
+        const barSpacing = width / costData.decileResults.length;
+        const yScale = height / yMax;
+
+        // Draw axes
+        const xAxis = createSVGElement("line", {
+          x1: 0,
+          y1: height,
+          x2: width,
+          y2: height,
+          class: "axis-line",
+        });
+        g.appendChild(xAxis);
+
+        const yAxis = createSVGElement("line", {
+          x1: 0,
+          y1: 0,
+          x2: 0,
+          y2: height,
+          class: "axis-line",
+        });
+        g.appendChild(yAxis);
+
+        // Draw grid lines and y-axis labels
+        for (let i = 0; i <= 5; i++) {
+          const y = height - (i * height) / 5;
+          const value = (i * yMax) / 5;
+
+          // Grid line
+          const gridLine = createSVGElement("line", {
+            x1: 0,
+            y1: y,
+            x2: width,
+            y2: y,
+            class: "grid-line",
+          });
+          g.appendChild(gridLine);
+
+          // Y-axis label
+          const yLabel = createSVGElement("text", {
+            x: -10,
+            y: y + 5,
+            class: "y-axis-label",
+          });
+          yLabel.textContent = `$${value}B`;
+          g.appendChild(yLabel);
+        }
+
+        // Draw zero line if it's within the chart range
+        const zeroY = height;
+        const zeroLine = createSVGElement("line", {
+          x1: 0,
+          y1: zeroY,
+          x2: width,
+          y2: zeroY,
+          class: "axis-line",
+        });
+        g.appendChild(zeroLine);
+
+        // Draw bars and x-axis labels for each decile
+        costData.decileResults.forEach((entry, index) => {
+          const x = index * barSpacing + barSpacing / 2;
+
+          // Calculate heights (multiply by taxpayers to get total values)
+          const ubiPayment = entry.ubiPayment * entry.taxpayers;
+          const taxRevenue = entry.taxRevenue * entry.taxpayers;
+          const netCost = entry.netCost * entry.taxpayers;
+
+          const ubiHeight = ubiPayment * yScale;
+          const taxHeight = taxRevenue * yScale;
+          const netHeight = Math.abs(netCost) * yScale;
+
+          // Draw UBI payment bar
+          const ubiBar = createSVGElement("rect", {
+            x: x - barWidth * 1.5,
+            y: height - ubiHeight,
+            width: barWidth,
+            height: ubiHeight,
+            fill: "#f59e0b",
+          });
+          g.appendChild(ubiBar);
+
+          // Draw tax revenue bar
+          const taxBar = createSVGElement("rect", {
+            x: x - barWidth * 0.5,
+            y: height - taxHeight,
+            width: barWidth,
+            height: taxHeight,
+            fill: "#9333ea",
+          });
+          g.appendChild(taxBar);
+
+          // Draw net cost bar
+          const netBar = createSVGElement("rect", {
+            x: x + barWidth * 0.5,
+            y: height - netHeight,
+            width: barWidth,
+            height: netHeight,
+            fill: "#ef4444",
+          });
+          g.appendChild(netBar);
+
+          // Add value labels
+          const ubiLabel = createSVGElement("text", {
+            x: x - barWidth,
+            y: height - ubiHeight - 10,
+            class: "value-label",
+            fill: "#f59e0b",
+          });
+          ubiLabel.textContent = `$${Math.round(ubiPayment)}B`;
+          g.appendChild(ubiLabel);
+
+          const taxLabel = createSVGElement("text", {
+            x: x,
+            y: height - taxHeight - 10,
+            class: "value-label",
+            fill: "#9333ea",
+          });
+          taxLabel.textContent = `$${Math.round(taxRevenue)}B`;
+          g.appendChild(taxLabel);
+
+          const netLabel = createSVGElement("text", {
+            x: x + barWidth,
+            y: height - netHeight - 10,
+            class: "value-label",
+            fill: "#ef4444",
+          });
+          netLabel.textContent = `$${Math.round(netCost)}B`;
+          g.appendChild(netLabel);
+
+          // Add x-axis label
+          const decileLabel = createSVGElement("text", {
+            x: x,
+            y: height + 25,
+            class: "axis-label",
+          });
+          decileLabel.textContent = `D${entry.decile}`;
+          g.appendChild(decileLabel);
+        });
+
+        // Add total values at the bottom
+        const totalY = height + 60;
+
+        const totalUbiLabel = createSVGElement("text", {
+          x: width / 2 - 200,
+          y: totalY,
+          class: "axis-label",
+          "font-weight": "bold",
+          fill: "#f59e0b",
+        });
+        totalUbiLabel.textContent = `Total UBI Cost: $${Math.round(costData.totalUbiCost)}B`;
+        g.appendChild(totalUbiLabel);
+
+        const totalTaxLabel = createSVGElement("text", {
+          x: width / 2,
+          y: totalY,
+          class: "axis-label",
+          "font-weight": "bold",
+          fill: "#9333ea",
+        });
+        totalTaxLabel.textContent = `Total Tax Revenue: $${Math.round(costData.totalTaxRevenue)}B`;
+        g.appendChild(totalTaxLabel);
+
+        const totalNetLabel = createSVGElement("text", {
+          x: width / 2 + 200,
+          y: totalY,
+          class: "axis-label",
+          "font-weight": "bold",
+          fill: "#ef4444",
+        });
+        totalNetLabel.textContent = `Net Cost: $${Math.round(costData.totalNetCost)}B`;
+        g.appendChild(totalNetLabel);
+
+        // Add axis titles
+        const xAxisTitle = createSVGElement("text", {
+          x: width / 2,
+          y: height + 90,
+          class: "axis-label",
+          "font-weight": "bold",
+        });
+        xAxisTitle.textContent = "Income Decile";
+        g.appendChild(xAxisTitle);
+
+        const yAxisTitle = createSVGElement("text", {
+          x: -height / 2,
+          y: -60,
+          class: "axis-label",
+          "font-weight": "bold",
+          transform: "rotate(-90)",
+        });
+        yAxisTitle.textContent = "Amount (billions)";
+        g.appendChild(yAxisTitle);
+      }
+
+      // Initialize the charts
+      document.addEventListener("DOMContentLoaded", updateCharts);
+    </script>
+  </body>
+</html>

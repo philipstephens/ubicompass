@@ -1,0 +1,150 @@
+.calculation-summary-container {
+  background-color: #f8f9fa;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  margin-top: 2rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.summary-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #2d3748;
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid #e2e8f0;
+  padding-bottom: 0.75rem;
+}
+
+.summary-section {
+  margin-bottom: 1.5rem;
+}
+
+.summary-row {
+  display: flex;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px dashed #e2e8f0;
+}
+
+.summary-row:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.line-number {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #2d3748;
+  width: 4rem;
+  flex-shrink: 0;
+}
+
+.line-description {
+  flex-grow: 1;
+}
+
+.line-formula {
+  font-size: 1rem;
+  color: #4a5568;
+  margin-bottom: 0.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.line-calculation {
+  font-size: 1.1rem;
+  color: #2d3748;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.formula-item,
+.calculation-item {
+  padding: 0.25rem 0.5rem;
+  margin-right: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.formula-item {
+  font-style: italic;
+}
+
+.calculation-item {
+  background-color: #edf2f7;
+  border-radius: 0.25rem;
+}
+
+.formula-operator,
+.calculation-operator {
+  margin: 0 0.5rem;
+  font-weight: 500;
+}
+
+.formula-result,
+.calculation-result {
+  font-weight: 700;
+  margin-left: 0.5rem;
+}
+
+.calculation-result {
+  background-color: #ebf8ff;
+  color: #2b6cb0;
+  padding: 0.25rem 0.75rem;
+  border-radius: 0.25rem;
+  border-left: 3px solid #4299e1;
+}
+
+.summary-notes {
+  font-size: 0.9rem;
+  color: #4a5568;
+  background-color: #f7fafc;
+  padding: 1rem;
+  border-radius: 0.25rem;
+  border-left: 3px solid #a0aec0;
+}
+
+.summary-notes p {
+  margin: 0.5rem 0;
+}
+
+.summary-notes p:first-child {
+  margin-top: 0;
+}
+
+.summary-notes p:last-child {
+  margin-bottom: 0;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .summary-row {
+    flex-direction: column;
+  }
+  
+  .line-number {
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+  
+  .line-formula,
+  .line-calculation {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .formula-operator,
+  .calculation-operator {
+    margin: 0.25rem 0;
+  }
+  
+  .formula-result,
+  .calculation-result {
+    margin-top: 0.5rem;
+    margin-left: 0;
+  }
+}

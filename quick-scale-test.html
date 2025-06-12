@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Scale Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test { background: #f8f9fa; padding: 15px; margin: 10px 0; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Quick Scale Test</h1>
+    
+    <div class="test">
+        <h3>Expected Values</h3>
+        <p>If the data is in thousands, we should see:</p>
+        <ul>
+            <li>Decile 1: ~$15k income</li>
+            <li>Decile 5: ~$50k income</li>
+            <li>Decile 10: ~$200k income</li>
+            <li>Y-axis should show: $0k, $50k, $100k, $150k, $200k, $250k</li>
+        </ul>
+    </div>
+    
+    <div class="test">
+        <h3>Current Chart</h3>
+        <iframe src="/decile-calculator-svg-demo.html?ubiAmount=24&taxPercentage=30&exemptionAmount=24" 
+                width="100%" height="600" style="border: 1px solid #ccc;"></iframe>
+    </div>
+    
+    <div class="test">
+        <h3>What I See</h3>
+        <p>Look at the Y-axis labels. Are they showing reasonable values like $50k, $100k, $200k?</p>
+        <p>Or are they showing huge numbers like $50000k, $100000k?</p>
+    </div>
+</body>
+</html>

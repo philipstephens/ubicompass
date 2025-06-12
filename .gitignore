@@ -40,3 +40,22 @@ lerna-debug.log*
 # Yarn
 .yarn/*
 !.yarn/releases
+
+# Large data files (>100MB) - excluded from GitHub
+ubi-backend/db/processed_data/income_distribution.sql
+ubi-backend/db/statscan_data/income_by_age_11100239.csv
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Large data files
+ubi-backend/db/processed_data/*.sql
+ubi-backend/db/statscan_data/*.csv
+
+# Screenshots and captures
+*.png
+*.jpg
+*.jpeg
+terminal-capture.txt

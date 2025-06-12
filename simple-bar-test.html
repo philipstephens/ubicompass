@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Bar Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .debug { background: #f8f9fa; padding: 15px; margin: 10px 0; border-radius: 5px; }
+        .error { background: #f8d7da; color: #721c24; }
+        .success { background: #d4edda; color: #155724; }
+        .warning { background: #fff3cd; color: #856404; }
+        iframe { width: 100%; height: 600px; border: 1px solid #ccc; margin: 10px 0; }
+        .manual-test { background: #e3f2fd; padding: 15px; margin: 10px 0; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Simple Bar Test</h1>
+    
+    <div class="debug warning">
+        <h3>🔧 Manual Bar Creation Test</h3>
+        <p>Let's manually create bars to see if the BarComponent is working at all.</p>
+    </div>
+    
+    <div class="manual-test">
+        <h3>Manual Test Chart</h3>
+        <svg id="test-chart" width="800" height="400" style="border: 1px solid #ccc;">
+            <!-- We'll create bars here manually -->
+        </svg>
+        <div id="manual-results"></div>
+    </div>
+    
+    <div id="debug-output"></div>
+    
+    <iframe id="chart-iframe" src="/decile-calculator-svg-demo.html?ubiAmount=24&taxPercentage=30&exemptionAmount=24"></iframe>
+    
+    <script>
+        const debugOutput = document.getElementById('debug-output');
+        const iframe = document.getElementById('chart-iframe');
+        const manualResults = document.getElementById('manual-results');
+        const testChart = document.getElementById('test-chart');
+        
+        function addDebug(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `debug ${type}`;
+            div.innerHTML = `<strong>${new Date().toLocaleTimeString()}:</strong> ${message}`;
+            debugOutput.appendChild(div);
+        }
+        
+        // Manual test - create bars directly
+        function createManualTest() {
+            addDebug('Creating manual test bars...', 'info');
+            
+            // Clear test chart
+            testChart.innerHTML = '';
+            
+            // Create simple bars manually
+            const bars = [
+                { x: 50, y: 300, width: 30, height: 100, fill: '#2196f3', label: 'Stacked' },
+                { x: 100, y: 250, width: 30, height: 150, fill: '#673ab7', label: 'Old' },
+                { x: 150, y: 200, width: 30, height: 200, fill: '#ff9800', label: 'New' }
+            ];
+            
+            bars.forEach((bar, index) => {
+                // Create rectangle
+                const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                rect.setAttribute('x', bar.x);
+                rect.setAttribute('y', bar.y);
+                rect.setAttribute('width', bar.width);
+                rect.setAttribute('height', bar.height);
+                rect.setAttribute('fill', bar.fill);
+                rect.setAttribute('stroke', '#333');
+                rect.setAttribute('stroke-width', '1');
+                testChart.appendChild(rect);
+                
+                // Create label
+                const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                text.setAttribute('x', bar.x + bar.width/2);
+                text.setAttribute('y', bar.y - 5);
+                text.setAttribute('text-anchor', 'middle');
+                text.setAttribute('font-size', '12px');
+                text.textContent = bar.label;
+                testChart.appendChild(text);
+            });
+            
+            manualResults.innerHTML = `
+                <p><strong>Manual Test Results:</strong></p>
+                <ul>
+                    <li>✅ Created ${bars.length} bars manually</li>
+                    <li>✅ All bars should be visible above</li>
+                    <li>If you can see these bars, the issue is with the BarComponent logic</li>
+                </ul>
+            `;
+        }
+        
+        // Run manual test immediately
+        createManualTest();
+        
+        iframe.addEventListener('load', () => {
+            setTimeout(() => {
+                try {
+                    const iframeDoc = iframe.contentDocument;
+                    const iframeWindow = iframe.contentWindow;
+                    
+                    addDebug('Testing actual chart...', 'info');
+                    
+                    const incomeChart = iframeDoc.getElementById('incomeChart');
+                    if (!incomeChart) {
+                        addDebug('❌ Income chart not found', 'error');
+                        return;
+                    }
+                    
+                    // Count bars by type
+                    const beforeTaxBars = incomeChart.querySelectorAll('.before-tax-income-bar');
+                    const ubiBars = incomeChart.querySelectorAll('.ubi-amount-bar');
+                    const afterTaxOldBars = incomeChart.querySelectorAll('.after-tax-old-bar');
+                    const afterTaxNewBars = incomeChart.querySelectorAll('.after-tax-new-bar');
+                    
+                    addDebug(`Bar counts:`, 'info');
+                    addDebug(`  - Before-tax income: ${beforeTaxBars.length}`, beforeTaxBars.length === 10 ? 'success' : 'error');
+                    addDebug(`  - UBI amount: ${ubiBars.length}`, ubiBars.length === 10 ? 'success' : 'error');
+                    addDebug(`  - After-tax OLD: ${afterTaxOldBars.length}`, afterTaxOldBars.length === 10 ? 'success' : 'error');
+                    addDebug(`  - After-tax NEW: ${afterTaxNewBars.length}`, afterTaxNewBars.length === 10 ? 'success' : 'error');
+                    
+                    // If after-tax bars are missing, try to manually create one
+                    if (afterTaxOldBars.length === 0 || afterTaxNewBars.length === 0) {
+                        addDebug('❌ After-tax bars missing. Testing manual creation...', 'error');
+                        
+                        if (iframeWindow.incomeBarComponent && iframeWindow.incomeChartBuilder) {
+                            try {
+                                addDebug('Attempting to manually create a test bar...', 'warning');
+                                
+                                const testBar = iframeWindow.incomeBarComponent.createBar({
+                                    x: 500,
+                                    y: 200,
+                                    width: 30,
+                                    height: 100,
+                                    type: 'afterTaxOld',
+                                    label: 'TEST'
+                                });
+                                
+                                if (testBar) {
+                                    addDebug('✅ Manual bar creation succeeded', 'success');
+                                } else {
+                                    addDebug('❌ Manual bar creation returned null', 'error');
+                                }
+                                
+                            } catch (e) {
+                                addDebug(`❌ Manual bar creation failed: ${e.message}`, 'error');
+                            }
+                        } else {
+                            addDebug('❌ BarComponent or ChartBuilder not available', 'error');
+                        }
+                    }
+                    
+                    // Check if the createMultiBarGroup is being called
+                    if (iframeWindow.incomeBarComponent) {
+                        addDebug('Testing createMultiBarGroup call...', 'warning');
+                        
+                        try {
+                            const testResult = iframeWindow.incomeBarComponent.createMultiBarGroup({
+                                centerX: 600,
+                                baseY: 350,
+                                bars: {
+                                    stacked: [
+                                        { height: 50, type: 'beforeTaxIncome' },
+                                        { height: 30, type: 'ubiAmount' }
+                                    ],
+                                    afterTaxOld: { height: 60, label: 'TEST OLD' },
+                                    afterTaxNew: { height: 70, label: 'TEST NEW' }
+                                },
+                                decileLabel: 'TEST'
+                            });
+                            
+                            addDebug(`✅ createMultiBarGroup returned ${testResult.length} bars`, 'success');
+                            
+                            // Check if the test bars are now visible
+                            setTimeout(() => {
+                                const newAfterTaxOldBars = incomeChart.querySelectorAll('.after-tax-old-bar');
+                                const newAfterTaxNewBars = incomeChart.querySelectorAll('.after-tax-new-bar');
+                                addDebug(`After manual creation - OLD: ${newAfterTaxOldBars.length}, NEW: ${newAfterTaxNewBars.length}`, 'info');
+                            }, 500);
+                            
+                        } catch (e) {
+                            addDebug(`❌ createMultiBarGroup test failed: ${e.message}`, 'error');
+                        }
+                    }
+                    
+                } catch (e) {
+                    addDebug(`❌ Test error: ${e.message}`, 'error');
+                }
+            }, 3000);
+        });
+    </script>
+</body>
+</html>

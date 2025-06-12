@@ -1,0 +1,239 @@
+.ubi-calculation-container {
+  padding: 1rem;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.loading, .error {
+  text-align: center;
+  padding: 2rem;
+  font-size: 1.1rem;
+}
+
+.error {
+  color: #e53e3e;
+  padding: 1.5rem;
+  background-color: #fff5f5;
+  border-radius: 0.5rem;
+  border: 1px solid #feb2b2;
+}
+
+.error p {
+  margin-bottom: 1rem;
+}
+
+.error-help {
+  color: #4a5568;
+  margin-top: 1rem;
+  font-size: 0.9rem;
+}
+
+.error-help ol {
+  margin-left: 1.5rem;
+  margin-top: 0.5rem;
+}
+
+.error-help li {
+  margin-bottom: 0.5rem;
+}
+
+.ubi-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.form-row label {
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.form-row select {
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  border: 1px solid #d1d5db;
+  background-color: white;
+  font-size: 1rem;
+  min-width: 300px;
+}
+
+.refresh-button {
+  margin-left: 0.5rem;
+  background-color: #4299e1;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  width: 30px;
+  height: 30px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+}
+
+.refresh-button:hover {
+  background-color: #3182ce;
+}
+
+.refresh-button:active {
+  background-color: #2b6cb0;
+}
+
+.taxpayers-info {
+  margin-left: 1rem;
+  font-weight: 500;
+  color: #4b5563;
+}
+
+.model-info {
+  margin-left: 1rem;
+  font-size: 0.9rem;
+  color: #4a5568;
+  font-style: italic;
+}
+
+.new-entry-form, .calculation-results, .no-year-selected {
+  background-color: rgba(255, 255, 255, 0.7);
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.new-entry-form h3, .calculation-header h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.calculation-header {
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+.calculation-divider {
+  height: 2px;
+  background-color: #e2e8f0;
+  border: none;
+  margin: 0 0 1.5rem 0;
+}
+
+.taxpayers-count {
+  margin-left: 1rem;
+  font-weight: 500;
+  color: #4b5563;
+}
+
+.loading-entries, .no-entries, .no-year-selected {
+  text-align: center;
+  padding: 2rem;
+  color: #4b5563;
+}
+
+/* Calculation Table Styles */
+.calculation-table-container {
+  overflow-x: auto;
+  margin-top: 1rem;
+}
+
+.calculation-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.calculation-table th,
+.calculation-table td {
+  padding: 0.75rem 1rem;
+  text-align: right;
+  border: 1px solid #e2e8f0;
+}
+
+.calculation-table th {
+  background-color: #f8fafc;
+  font-weight: 600;
+}
+
+.calculation-table .description-col {
+  text-align: left;
+  font-weight: 500;
+  min-width: 200px;
+}
+
+.calculation-table tr:nth-child(even) {
+  background-color: #f8fafc;
+}
+
+.calculation-table tr:hover {
+  background-color: #edf2f7;
+}
+
+.table-header {
+  background-color: #e2e8f0;
+}
+
+.calculation-footnote {
+  margin-top: 1rem;
+  font-size: 0.85rem;
+  font-style: italic;
+  color: #4a5568;
+  text-align: right;
+}
+
+/* Calculation Summary Styles */
+.calculation-summary-row {
+  background-color: #f8f9fa;
+}
+
+.calculation-summary {
+  padding: 1.5rem;
+  text-align: left;
+  border-top: 2px solid #e2e8f0;
+}
+
+.summary-line {
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+  line-height: 1.5;
+}
+
+.summary-line:last-child {
+  margin-bottom: 0;
+}
+
+.line-label {
+  font-weight: 700;
+  margin-right: 1rem;
+  color: #2d3748;
+}
+
+.line-calculation {
+  color: #4a5568;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .form-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .taxpayers-info,
+  .model-info {
+    margin-left: 0;
+    margin-top: 0.5rem;
+  }
+
+  .form-row select {
+    width: 100%;
+    min-width: unset;
+  }
+}

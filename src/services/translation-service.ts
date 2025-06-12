@@ -496,6 +496,16 @@ async function mockTranslate(text: string, language: string): Promise<string> {
       'fr': 'Correspondance de Percentile',
       'de': 'Perzentil-Abgleich',
     },
+    'Switch to Quintile View': {
+      'es': 'Cambiar a Vista de Quintiles',
+      'fr': 'Passer à la Vue par Quintiles',
+      'de': 'Zur Quintilansicht wechseln',
+    },
+    'Switch to Decile View': {
+      'es': 'Cambiar a Vista de Deciles',
+      'fr': 'Passer à la Vue par Déciles',
+      'de': 'Zur Dezilansicht wechseln',
+    },
     'Tax Model Comparison': {
       'es': 'Comparación de Modelos Fiscales',
       'fr': 'Comparaison des Modèles Fiscaux',
