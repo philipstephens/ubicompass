@@ -1,6 +1,22 @@
 {
-  "name": "my-qwik-empty-starter",
-  "description": "Blank project with routing included",
+  "name": "ubi-compass",
+  "description": "Universal Basic Income Policy Analysis Tool - Comprehensive UBI feasibility calculator with real Canadian economic data and multilingual support",
+  "version": "1.0.0",
+  "author": "Philip Stephens",
+  "keywords": [
+    "ubi",
+    "universal-basic-income",
+    "policy-analysis",
+    "economics",
+    "canada",
+    "multilingual",
+    "qwik"
+  ],
+  "homepage": "https://github.com/philipstephens/ubi-compass",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/philipstephens/ubi-compass.git"
+  },
   "engines": {
     "node": "^18.17.0 || ^20.3.0 || >=21.0.0"
   },
@@ -20,28 +36,42 @@
     "lint": "eslint \"src/**/*.ts*\"",
     "preview": "qwik build preview && vite preview --open",
     "start": "vite --open --mode ssr",
-    "qwik": "qwik"
+    "qwik": "qwik",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "test:watch": "vitest --watch",
+    "test:unit": "vitest run src/tests/unit",
+    "test:integration": "vitest run src/tests/integration",
+    "test:e2e": "playwright test"
   },
   "devDependencies": {
     "@builder.io/qwik": "^1.13.0",
     "@builder.io/qwik-city": "^1.13.0",
+    "@playwright/test": "^1.40.0",
     "@types/eslint": "8.56.10",
     "@types/node": "20.14.11",
     "@typescript-eslint/eslint-plugin": "7.16.1",
     "@typescript-eslint/parser": "7.16.1",
+    "@vitest/coverage-v8": "^1.0.0",
+    "@vitest/ui": "^1.0.0",
     "clsx": "^2.1.1",
     "eslint": "8.57.0",
     "eslint-plugin-qwik": "^1.13.0",
+    "jsdom": "^23.0.0",
     "prettier": "3.3.3",
     "typescript": "5.4.5",
     "undici": "*",
     "vite": "5.3.5",
-    "vite-tsconfig-paths": "^4.2.1"
+    "vite-tsconfig-paths": "^4.2.1",
+    "vitest": "^1.0.0"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.7",
     "@types/pg": "^8.15.3",
     "chart.js": "^4.4.9",
+    "csv-parser": "^3.2.0",
     "express": "^5.1.0",
     "pg": "^8.16.0",
     "tailwindcss": "^4.1.7"

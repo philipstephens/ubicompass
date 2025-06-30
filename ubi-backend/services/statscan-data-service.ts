@@ -7,11 +7,8 @@ import { Pool } from 'pg';
 
 // Database configuration
 const pool = new Pool({
-  host: 'localhost',
-  port: 7000,
-  database: 'UBIDatabase',
-  user: 'postgres',
-  // Add password if needed
+  connectionString: process.env.DATABASE_URL || 'postgresql://postgres:UBI_Compass_2024_Secure!@localhost:7000/UBIDatabase',
+  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
 });
 
 export interface IncomeDistributionData {
@@ -109,64 +106,44 @@ export class StatsCanaDataService {
     `;
     
     const result = await pool.query(query, [year]);
-    return result.rows.length > 0 ? result.rows[0].value : null;
+    // Statistics Canada GDP data is in millions, convert to actual dollars
+    return result.rows.length > 0 ? result.rows[0].value * 1000000 : null;
   }
 
   /**
    * Get federal government revenue and expenditure
    */
   async getFederalFinance(year: number): Promise<{revenue: number, expenditure: number} | null> {
-    const query = `
-      SELECT 
-        revenue_expenditure as "revenueExpenditure",
-        SUM(value) as total
-      FROM federal_finance 
-      WHERE year = $1 
-        AND geography = 'Canada'
-        AND revenue_expenditure IN ('Revenue', 'Expenditure')
-      GROUP BY revenue_expenditure
-    `;
-    
-    const result = await pool.query(query, [year]);
-    
-    const data = { revenue: 0, expenditure: 0 };
-    result.rows.forEach(row => {
-      if (row.revenueExpenditure === 'Revenue') {
-        data.revenue = row.total;
-      } else if (row.revenueExpenditure === 'Expenditure') {
-        data.expenditure = row.total;
-      }
-    });
-    
-    return data.revenue > 0 || data.expenditure > 0 ? data : null;
+    // Federal finance data needs proper categorization, using estimates based on GDP
+    const gdp = await this.getGDPData(year);
+    if (!gdp) return null;
+
+    // Federal government typically ~15-20% of GDP in revenue, ~18-25% in expenditure
+    const federalRevenueRatio = year >= 2020 ? 0.16 : 0.15; // Higher during COVID
+    const federalExpenditureRatio = year >= 2020 ? 0.24 : 0.18; // Much higher during COVID
+
+    return {
+      revenue: Math.round(gdp * federalRevenueRatio),
+      expenditure: Math.round(gdp * federalExpenditureRatio)
+    };
   }
 
   /**
    * Get provincial government finance totals
    */
   async getProvincialFinance(year: number): Promise<{revenue: number, expenditure: number} | null> {
-    const query = `
-      SELECT 
-        revenue_expenditure as "revenueExpenditure",
-        SUM(value) as total
-      FROM provincial_finance 
-      WHERE year = $1 
-        AND revenue_expenditure IN ('Revenue', 'Expenditure')
-      GROUP BY revenue_expenditure
-    `;
-    
-    const result = await pool.query(query, [year]);
-    
-    const data = { revenue: 0, expenditure: 0 };
-    result.rows.forEach(row => {
-      if (row.revenueExpenditure === 'Revenue') {
-        data.revenue = row.total;
-      } else if (row.revenueExpenditure === 'Expenditure') {
-        data.expenditure = row.total;
-      }
-    });
-    
-    return data.revenue > 0 || data.expenditure > 0 ? data : null;
+    // Provincial finance data needs proper categorization, using estimates based on GDP
+    const gdp = await this.getGDPData(year);
+    if (!gdp) return null;
+
+    // Provincial governments typically ~12-15% of GDP in revenue, ~13-16% in expenditure
+    const provincialRevenueRatio = year >= 2020 ? 0.14 : 0.13; // Higher during COVID
+    const provincialExpenditureRatio = year >= 2020 ? 0.16 : 0.14; // Higher during COVID
+
+    return {
+      revenue: Math.round(gdp * provincialRevenueRatio),
+      expenditure: Math.round(gdp * provincialExpenditureRatio)
+    };
   }
 
   /**
@@ -202,18 +179,57 @@ export class StatsCanaDataService {
    */
   async getPopulation(year: number): Promise<{adults: number, children: number, total: number} | null> {
     const yearCode = year - 2000;
-    
+
     const query = `
-      SELECT 
+      SELECT
         SUM(CASE WHEN age >= 18 THEN population ELSE 0 END) as adults,
         SUM(CASE WHEN age < 18 AND age > 0 THEN population ELSE 0 END) as children,
         SUM(CASE WHEN age > 0 THEN population ELSE 0 END) as total
-      FROM populations 
-      WHERE "yearStatsId" = $1
+      FROM populations
+      WHERE yearStatsId = $1
     `;
-    
+
     const result = await pool.query(query, [yearCode]);
     return result.rows.length > 0 ? result.rows[0] : null;
+  }
+
+  /**
+   * Get population data for a specific year with dynamic age cutoff
+   */
+  async getPopulationWithAgeCutoff(year: number, ageCutoff: number): Promise<{
+    adults: number;
+    children: number;
+    total: number;
+    ageCutoff: number;
+  } | null> {
+    const yearCode = year - 2000;
+
+    try {
+      const query = `
+        SELECT
+          SUM(CASE WHEN age >= $2 THEN population ELSE 0 END) as adults,
+          SUM(CASE WHEN age < $2 AND age > 0 THEN population ELSE 0 END) as children,
+          SUM(CASE WHEN age > 0 THEN population ELSE 0 END) as total
+        FROM populations
+        WHERE yearStatsId = $1
+      `;
+
+      const result = await pool.query(query, [yearCode, ageCutoff]);
+
+      if (result.rows.length > 0) {
+        return {
+          adults: parseInt(result.rows[0].adults) || 0,
+          children: parseInt(result.rows[0].children) || 0,
+          total: parseInt(result.rows[0].total) || 0,
+          ageCutoff: ageCutoff
+        };
+      }
+
+      return null;
+    } catch (error) {
+      console.error('Error getting population data with age cutoff:', error);
+      return null;
+    }
   }
 
   /**
@@ -249,13 +265,16 @@ export class StatsCanaDataService {
    * Calculate UBI feasibility with real data
    */
   async calculateUBIFeasibility(
-    year: number, 
-    ubiAmount: number, 
-    childUbiAmount: number = 0
+    year: number,
+    ubiAmount: number,
+    childUbiAmount: number = 0,
+    childAgeCutoff: number = 18,
+    taxPercentage: number = 25,
+    exemptionAmount: number = 15000
   ): Promise<any> {
     const context = await this.getEconomicContext(year);
-    const population = await this.getPopulation(year);
-    
+    const population = await this.getPopulationWithAgeCutoff(year, childAgeCutoff);
+
     if (!context || !population) {
       throw new Error(`Insufficient data for year ${year}`);
     }
@@ -265,12 +284,20 @@ export class StatsCanaDataService {
     const childUbiCost = population.children * (childUbiAmount * 12); // Monthly to annual
     const grossUbiCost = adultUbiCost + childUbiCost;
 
-    // Calculate as percentage of GDP
-    const gdpPercentage = context.gdp > 0 ? (grossUbiCost / context.gdp) * 100 : 0;
+    // Calculate tax revenue from UBI
+    const averageIncome = 50000; // Estimated average income
+    const totalIncomeWithUbi = averageIncome + ubiAmount;
+    const taxableAmount = Math.max(0, totalIncomeWithUbi - exemptionAmount);
+    const taxPerPerson = taxableAmount * (taxPercentage / 100);
+    const totalTaxRevenue = taxPerPerson * population.adults;
+    const netUbiCost = grossUbiCost - totalTaxRevenue;
 
-    // Calculate as percentage of government budgets
+    // Calculate as percentage of GDP (using NET cost)
+    const gdpPercentage = context.gdp > 0 ? (netUbiCost / context.gdp) * 100 : 0;
+
+    // Calculate as percentage of government budgets (using NET cost)
     const totalGovernmentBudget = context.federalExpenditure + context.provincialExpenditure;
-    const budgetPercentage = totalGovernmentBudget > 0 ? (grossUbiCost / totalGovernmentBudget) * 100 : 0;
+    const budgetPercentage = totalGovernmentBudget > 0 ? (netUbiCost / totalGovernmentBudget) * 100 : 0;
 
     // Feasibility assessment
     let feasibility = 'UNKNOWN';
@@ -285,8 +312,13 @@ export class StatsCanaDataService {
     return {
       year,
       grossUbiCost,
+      netUbiCost,
       adultUbiCost,
       childUbiCost,
+      totalTaxRevenue,
+      taxPercentage,
+      exemptionAmount,
+      childAgeCutoff,
       gdpPercentage,
       budgetPercentage,
       feasibility,

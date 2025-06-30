@@ -2,7 +2,7 @@ import { Pool } from 'pg';
 
 // Database connection pool
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL || 'postgresql://username:password@localhost:7000/UBIDatabase',
+  connectionString: process.env.DATABASE_URL || 'postgresql://postgres:UBI_Compass_2024_Secure!@localhost:7000/UBIDatabase',
   // For development
   ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
   max: 20,

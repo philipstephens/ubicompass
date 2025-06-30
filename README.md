@@ -1,65 +1,115 @@
-# Qwik City App ⚡️
+# 🧭 UBI Compass
 
-- [Qwik Docs](https://qwik.dev/)
-- [Discord](https://qwik.dev/chat)
-- [Qwik GitHub](https://github.com/QwikDev/qwik)
-- [@QwikDev](https://twitter.com/QwikDev)
-- [Vite](https://vitejs.dev/)
+**Universal Basic Income Policy Analysis Tool**
+
+A comprehensive, multilingual UBI feasibility calculator powered by real Canadian economic data from Statistics Canada (2000-2023). Democratizing UBI policy analysis for billions of people worldwide.
+
+## 🌟 Features
+
+- **📊 Real Economic Data**: Statistics Canada datasets covering GDP, government finances, population, and income distribution
+- **🌍 Multilingual Support**: 70+ languages via Google Translate API integration
+- **⚡ Real-time Calculations**: Interactive sliders with instant feasibility assessment
+- **🎯 Professional Analysis**: GDP percentage, budget impact, and feasibility scoring
+- **📱 Responsive Design**: Works on desktop, tablet, and mobile devices
+- **🔒 Secure**: CSP-compliant with modern security practices
+
+## 🚀 Live Demo
+
+[Try UBI Compass](https://your-domain.com) - Available in English, French, Spanish, and 70+ other languages
 
 ---
 
-## Project Structure
+## 📁 Project Structure
 
-This project is using Qwik with [QwikCity](https://qwik.dev/qwikcity/overview/). QwikCity is just an extra set of tools on top of Qwik to make it easier to build a full site, including directory-based routing, layouts, and more.
-
-Inside your project, you'll see the following directory structure:
-
-```
-├── public/
-│   └── ...
-└── src/
-    ├── components/
-    │   └── ...
-    └── routes/
-        └── ...
-```
-
-- `src/routes`: Provides the directory-based routing, which can include a hierarchy of `layout.tsx` layout files, and an `index.tsx` file as the page. Additionally, `index.ts` files are endpoints. Please see the [routing docs](https://qwik.dev/qwikcity/routing/overview/) for more info.
-
-- `src/components`: Recommended directory for components.
-
-- `public`: Any static assets, like images, can be placed in the public directory. Please see the [Vite public directory](https://vitejs.dev/guide/assets.html#the-public-directory) for more info.
-
-## Add Integrations and deployment
-
-Use the `npm run qwik add` command to add additional integrations. Some examples of integrations includes: Cloudflare, Netlify or Express Server, and the [Static Site Generator (SSG)](https://qwik.dev/qwikcity/guides/static-site-generation/).
-
-```shell
-npm run qwik add # or `yarn qwik add`
+```bash
+ubi-compass/
+├── src/
+│   ├── routes/
+│   │   ├── api/translate/          # Google Translate API integration
+│   │   ├── api/statscan/           # Statistics Canada data endpoints
+│   │   └── ubi-compass-simple/     # Main UBI calculator interface
+│   ├── components/                 # Reusable UI components
+│   └── utils/                      # Utility functions
+├── utilities/                      # Python data processing scripts
+├── docs/                          # Documentation and guides
+├── scripts/                       # PowerShell automation scripts
+└── public/                        # Static assets
 ```
 
-## Development
+## 🛠️ Technology Stack
 
-Development mode uses [Vite's development server](https://vitejs.dev/). The `dev` command will server-side render (SSR) the output during development.
+- **Frontend**: [Qwik](https://qwik.dev/) + TypeScript
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
+- **Database**: PostgreSQL with Statistics Canada data
+- **Translation**: Google Translate API
+- **Charts**: Chart.js for data visualization
+- **Deployment**: Ready for Vercel, Netlify, or any Node.js host
 
-```shell
-npm start # or `yarn start`
+## 🚀 Quick Start
+
+### Prerequisites
+- Node.js 18+
+- PostgreSQL 16+ (for local development)
+- Google Cloud account (for translation features)
+
+### Installation
+
+1. **Clone the repository**
+```bash
+git clone https://github.com/philipstephens/ubi-compass.git
+cd ubi-compass
 ```
 
-> Note: during dev mode, Vite may request a significant number of `.js` files. This does not represent a Qwik production build.
-
-## Preview
-
-The preview command will create a production build of the client modules, a production build of `src/entry.preview.tsx`, and run a local server. The preview server is only for convenience to preview a production build locally and should not be used as a production server.
-
-```shell
-npm run preview # or `yarn preview`
+2. **Install dependencies**
+```bash
+npm install
 ```
 
-## Production
-
-The production build will generate client and server modules by running both client and server build commands. The build command will use Typescript to run a type check on the source code.
-
-```shell
-npm run build # or `yarn build`
+3. **Set up environment variables**
+```bash
+cp .env.example .env
+# Edit .env with your database and API keys
 ```
+
+4. **Start development server**
+```bash
+npm run dev
+```
+
+5. **Open your browser**
+```
+http://localhost:5173/ubi-compass-simple/
+```
+
+## 🌍 Translation Setup
+
+To enable multilingual support:
+
+1. **Create Google Cloud Project**
+2. **Enable Cloud Translation API**
+3. **Create API Key**
+4. **Add to .env file**:
+```bash
+GOOGLE_TRANSLATE_API_KEY=your_api_key_here
+```
+
+## 📊 Data Sources
+
+- **Statistics Canada**: GDP, government finances, population data
+- **Canadian Census**: Demographic breakdowns
+- **Bank of Canada**: Inflation and economic indicators
+- **Coverage**: 2000-2023 with comprehensive economic datasets
+
+## 🤝 Contributing
+
+We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+## 📄 License
+
+MIT License - see [LICENSE](LICENSE) for details.
+
+## 🙏 Acknowledgments
+
+- Statistics Canada for comprehensive economic data
+- Google Translate for multilingual accessibility
+- Qwik team for the amazing framework

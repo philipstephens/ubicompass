@@ -1,0 +1,51 @@
+The blue track color for the child section goes up to 22 but the child handle can move past 22.  Could the handle movement be restricted to the maximum age for a child?
+
+create a "Generic Triple Slider" with the following specs: 
+
+props: initialPixelSliderLength, minDataValue, maxDataValue, maxDataValue1, maxDataValue2, maxDataValue3,
+       trackColor1, trackColor2, trackColor3, trackColor4
+
+function getPixelPosition(pixelsPerValue, dataValue, minDataValue=0) {
+	return (dataValue - minDataValue) * pixelsPerValue
+}
+
+function getHandlePosition(positionData, minHandleDataValue, maxHandleDataValue) {
+	if (positionData >= minHandleDataValue) and (positionData <= maxHandleDataValue) {
+	    ...
+		return getPixelPosition(pixelsPerValue, positionData,)
+	}	
+}
+
+minDataValue
+maxDataValue
+valueDataLength = maxDataValue - minDataValue + 1
+
+initialPixelSliderLength
+pixelsPerValue = int(initialPixelSliderLength / valueDataLength + 0.5)
+finalPixelLength = getPixelPosition(pixelsPerValue, maxDataValue, minDataValue)
+
+minDataValue1 = minSliderValue
+maxDataValue1
+minPixelValue1 = getPixelPosition(pixelsPerValue, minDataValue1, minDataValue)
+maxPixelValue1 = getPixelPosition(pixelsPerValue, maxDataValue1, minDataValue)
+
+minDataValue2 = maxDataValue1
+maxDataValue2
+minPixelValue2 = getPixelPosition(pixelsPerValue, minDataValue2, minDataValue)
+maxPixelValue2 = getPixelPosition(pixelsPerValue, maxDataValue2, minDataValue)
+
+minDataValue3 = maxDataValue2
+maxDataValue3
+minPixelValue3 = getPixelPosition(pixelsPerValue, minDataValue3, minDataValue)
+maxPixelValue3 = getPixelPosition(pixelsPerValue, maxDataValue3, minDataValue)
+
+minDataValue4 = maxDataValue3
+maxDataValue4 = maxDataValue
+
+minPixelValue4 = getPixelPosition(pixelsPerValue, minDataValue4, minDataValue)
+maxPixelValue4 = finalPixelLength
+
+trackcolor1 (default=none)
+trackcolor2
+trackcolor3
+
