@@ -29,11 +29,13 @@ export interface TranslationState {
 }
 
 export interface TranslationActions {
-  translate: (text: string) => string;
-  switchLanguage: (language: string) => Promise<void>;
-  formatNumber: (number: number, options?: Intl.NumberFormatOptions) => string;
-  formatCurrency: (amount: number, currency?: string) => string;
-  formatPercentage: (value: number, decimals?: number) => string;
+  translate: QRL<(text: string) => string>;
+  switchLanguage: QRL<(language: string) => Promise<void>>;
+  formatNumber: QRL<
+    (number: number, options?: Intl.NumberFormatOptions) => string
+  >;
+  formatCurrency: QRL<(amount: number, currency?: string) => string>;
+  formatPercentage: QRL<(value: number, decimals?: number) => string>;
 }
 
 export interface TranslationContext {
@@ -146,7 +148,7 @@ export const TranslationProvider = component$(() => {
 
   // Create actions
   const actions: TranslationActions = {
-    translate: $((text: string): string => {
+    translate: $((text: string) => {
       // For English, return original text
       if (state.currentLanguage === "en") {
         return text;
@@ -489,7 +491,7 @@ export const TranslationProvider = component$(() => {
 
     formatNumber: formatNumberHelper,
 
-    formatCurrency: $((amount: number, currency: string = "CAD"): string => {
+    formatCurrency: $((amount: number, currency: string = "CAD") => {
       try {
         return new Intl.NumberFormat(state.currentLanguage, {
           style: "currency",
@@ -502,7 +504,7 @@ export const TranslationProvider = component$(() => {
       }
     }),
 
-    formatPercentage: $((value: number, decimals: number = 1): string => {
+    formatPercentage: $((value: number, decimals: number = 1) => {
       try {
         return new Intl.NumberFormat(state.currentLanguage, {
           style: "percent",
