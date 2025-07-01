@@ -58,7 +58,7 @@ export interface FeasibilityResult {
   netUbiCost: number;
   gdpPercentage: number;
   budgetPercentage: number;
-  feasibility: "FEASIBLE" | "CHALLENGING" | "DIFFICULT";
+  feasibility: "SURPLUS" | "FEASIBLE" | "CHALLENGING" | "DIFFICULT";
 }
 
 /**

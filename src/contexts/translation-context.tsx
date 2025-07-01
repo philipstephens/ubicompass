@@ -9,6 +9,7 @@ import {
   useStore,
   useTask$,
   $,
+  type QRL,
   component$,
   Slot,
 } from "@builder.io/qwik";

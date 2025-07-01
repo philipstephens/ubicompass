@@ -134,7 +134,7 @@ const UbiCompassContent = component$(() => {
 
     try {
       // Get current language from translation context
-      const currentLanguage = "en"; // TODO: Get from translation context
+      const responseLanguage = translationState.currentLanguage;
 
       const response = await fetch("/api/feedback", {
         method: "POST",
@@ -212,14 +212,14 @@ const UbiCompassContent = component$(() => {
       } else {
         // Localized error message
         let errorMsg = `Error: ${result.error || "Failed to submit feedback"}`;
-        if (currentLanguage === "fr") {
+        if (responseLanguage === "fr") {
           errorMsg = `[FR] Erreur: ${result.error || "Échec de l'envoi des commentaires"}`;
-        } else if (currentLanguage === "es") {
+        } else if (responseLanguage === "es") {
           errorMsg = `[ES] Error: ${result.error || "Error al enviar comentarios"}`;
-        } else if (currentLanguage === "de") {
+        } else if (responseLanguage === "de") {
           errorMsg = `[DE] Fehler: ${result.error || "Feedback konnte nicht gesendet werden"}`;
-        } else if (currentLanguage !== "en") {
-          errorMsg = `[${currentLanguage.toUpperCase()}] Error: ${result.error || "Failed to submit feedback"}`;
+        } else if (responseLanguage !== "en") {
+          errorMsg = `[${responseLanguage.toUpperCase()}] Error: ${result.error || "Failed to submit feedback"}`;
         }
         alert(errorMsg);
       }
@@ -229,17 +229,17 @@ const UbiCompassContent = component$(() => {
       // Localized network error message
       let networkErrorMsg =
         "Failed to submit feedback. Please try again later.";
-      if (currentLanguage === "fr") {
+      if (responseLanguage === "fr") {
         networkErrorMsg =
           "[FR] Échec de l'envoi des commentaires. Veuillez réessayer plus tard.";
-      } else if (currentLanguage === "es") {
+      } else if (responseLanguage === "es") {
         networkErrorMsg =
           "[ES] Error al enviar comentarios. Por favor, inténtelo de nuevo más tarde.";
-      } else if (currentLanguage === "de") {
+      } else if (responseLanguage === "de") {
         networkErrorMsg =
           "[DE] Feedback konnte nicht gesendet werden. Bitte versuchen Sie es später erneut.";
-      } else if (currentLanguage !== "en") {
-        networkErrorMsg = `[${currentLanguage.toUpperCase()}] Failed to submit feedback. Please try again later.`;
+      } else if (responseLanguage !== "en") {
+        networkErrorMsg = `[${responseLanguage.toUpperCase()}] Failed to submit feedback. Please try again later.`;
       }
       alert(networkErrorMsg);
     }
