@@ -5,8 +5,8 @@ import { UbiCompassRedesigned } from "~/components/ubi-compass-redesigned";
 export default component$(() => {
   return (
     <div>
-      <h1>UBI Compass - Node.js Runtime Test</h1>
-      <p>Testing Node.js runtime with PostgreSQL support!</p>
+      <h1>UBI Compass - Final Deployment Test</h1>
+      <p>PostgreSQL dependencies removed - should work now!</p>
       <UbiCompassRedesigned />
     </div>
   );
