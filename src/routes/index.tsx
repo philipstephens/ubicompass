@@ -5,6 +5,7 @@ import { UbiCompassRedesigned } from "~/components/ubi-compass-redesigned";
 export default component$(() => {
   return (
     <div>
+      <h1>UBI Compass - Test</h1>
       <UbiCompassRedesigned />
     </div>
   );

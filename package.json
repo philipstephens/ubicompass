@@ -37,7 +37,7 @@
     "preview": "qwik build preview && vite preview --open",
     "start": "vite --open --mode ssr",
     "qwik": "qwik",
-    "vercel-build": "npm run build.client",
+    "vercel-build": "qwik build",
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:run": "vitest run",
