@@ -1,4 +1,4 @@
-# 🧭 UBI Compass
+# 🧭 UBI Compass - Production Ready
 
 **Universal Basic Income Policy Analysis Tool**
 
