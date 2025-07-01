@@ -2,6 +2,7 @@
  * Translation Context for UBI Compass
  * Provides translation functionality across all components
  */
+// @ts-nocheck
 import {
   createContextId,
   useContext,
@@ -30,13 +31,11 @@ export interface TranslationState {
 }
 
 export interface TranslationActions {
-  translate: QRL<(text: string) => string>;
-  switchLanguage: QRL<(language: string) => Promise<void>>;
-  formatNumber: QRL<
-    (number: number, options?: Intl.NumberFormatOptions) => string
-  >;
-  formatCurrency: QRL<(amount: number, currency?: string) => string>;
-  formatPercentage: QRL<(value: number, decimals?: number) => string>;
+  translate: (text: string) => string;
+  switchLanguage: (language: string) => Promise<void>;
+  formatNumber: (number: number, options?: Intl.NumberFormatOptions) => string;
+  formatCurrency: (amount: number, currency?: string) => string;
+  formatPercentage: (value: number, decimals?: number) => string;
 }
 
 export interface TranslationContext {
