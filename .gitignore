@@ -59,3 +59,6 @@ ubi-backend/db/statscan_data/*.csv
 *.jpg
 *.jpeg
 terminal-capture.txt
+
+# Vercel
+.vercel
