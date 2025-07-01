@@ -1,4 +1,9 @@
 {
+  "functions": {
+    ".vercel/output/functions/_qwik-city.func/index.js": {
+      "runtime": "edge"
+    }
+  },
   "headers": [
     {
       "source": "/(.*)?service-worker.js",

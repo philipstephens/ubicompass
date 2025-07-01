@@ -5,7 +5,8 @@ import { UbiCompassRedesigned } from "~/components/ubi-compass-redesigned";
 export default component$(() => {
   return (
     <div>
-      <h1>UBI Compass - Test</h1>
+      <h1>Hello World - Vercel Test</h1>
+      <p>If you can see this, the deployment is working!</p>
       <UbiCompassRedesigned />
     </div>
   );
