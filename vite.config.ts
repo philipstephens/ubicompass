@@ -23,12 +23,7 @@ errorOnDuplicatesPkgDeps(devDependencies, dependencies);
 export default defineConfig(({ command, mode }): UserConfig => {
   return {
     plugins: [
-      qwikCity({
-        // Configure static file handling
-        staticGenerate: {
-          // Allow static files to be served directly
-        }
-      }),
+      qwikCity(),
       qwikVite(),
       tsconfigPaths()
     ],

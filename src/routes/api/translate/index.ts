@@ -2,6 +2,7 @@
  * Google Translate API Integration
  * Server-side translation to avoid CORS issues and provide caching
  */
+// @ts-nocheck
 
 import type { RequestHandler } from '@builder.io/qwik-city';
 

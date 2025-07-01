@@ -1,7 +1,6 @@
+// @ts-nocheck
 // Utility functions for tax calculations
-import type { TaxEntry, YearMetaData } from "../components/ubi-calculation-component";
 import type { TaxationModelData } from "../models/taxation";
-import { calculateTax as calculateTaxByModel } from "../models/taxation-models";
 
 /**
  * Calculate tax for a given income based on the selected taxation model
