@@ -1,8 +1,9 @@
 // Script to update the database schema and add sample data
+// TEMPORARILY DISABLED FOR DEPLOYMENT
 require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
-const { pool } = require('./db');
+// const { pool } = require('./db'); // TEMPORARILY DISABLED FOR DEPLOYMENT
 
 async function updateDatabase() {
   console.log('Starting database update...');
