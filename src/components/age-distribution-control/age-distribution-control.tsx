@@ -7,6 +7,7 @@ import {
   useTask$,
   useVisibleTask$,
   useStore,
+  useComputed$,
 } from "@builder.io/qwik";
 import { TripleHandleSlider } from "../triple-handle-slider/triple-handle-slider";
 import { getPopulationData } from "../../services/statistics-service";
@@ -697,8 +698,8 @@ export const AgeDistributionControl = component$<AgeDistributionControlProps>(
       }
     });
 
-    // Calculate population pie chart data
-    const populationData = [
+    // Calculate population pie chart data using computed signal for stability
+    const populationData = useComputed$(() => [
       {
         label: `👶 ${t("Children")}`,
         value: populationStore.childPopulation,
@@ -743,7 +744,7 @@ export const AgeDistributionControl = component$<AgeDistributionControlProps>(
             : 0,
         color: "#8b5cf6",
       },
-    ];
+    ]);
 
     return (
       <div class={`age-distribution-control ${className}`.trim()}>
@@ -873,7 +874,7 @@ export const AgeDistributionControl = component$<AgeDistributionControlProps>(
                   <T text="Population Chart" />
                 </h3>
 
-                {populationStore.isLoading && (
+                {populationStore.isLoading && populationStore.populationByAge.length === 0 && (
                   <div style="text-align: center; padding: 2rem; color: #6b7280;">
                     <T text="Loading population data..." />
                   </div>
@@ -889,11 +890,11 @@ export const AgeDistributionControl = component$<AgeDistributionControlProps>(
                   </div>
                 )}
 
-                {!populationStore.isLoading && (
+                {(populationStore.populationByAge.length > 0 || !populationStore.isLoading) && (
                   <>
                     <svg class="pie-chart" viewBox="0 0 200 200">
-                      {populationData.map((segment, index) => {
-                        const startAngle = populationData
+                      {populationData.value.map((segment, index) => {
+                        const startAngle = populationData.value
                           .slice(0, index)
                           .reduce(
                             (sum, s) => sum + (s.percentage / 100) * 360,
@@ -928,7 +929,7 @@ export const AgeDistributionControl = component$<AgeDistributionControlProps>(
                       })}
                     </svg>
                     <div class="pie-legend">
-                      {populationData.map((item, index) => (
+                      {populationData.value.map((item, index) => (
                         <div key={index} class="pie-legend-item">
                           <div style="display: flex; align-items: center;">
                             <div
