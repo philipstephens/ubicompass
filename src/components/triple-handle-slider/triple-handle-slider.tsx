@@ -334,7 +334,10 @@ export const TripleHandleSlider = component$<TripleHandleSliderProps>(
 
     // Handle mouse down on handle (start drag)
     const handleMouseDown = $((handleIndex: number, event: MouseEvent) => {
+      console.log("🖱️ Triple Handle Slider: Mouse down on handle", handleIndex);
+
       if (disabled) {
+        console.log("🚫 Triple Handle Slider: Slider is disabled");
         return;
       }
 
@@ -345,9 +348,18 @@ export const TripleHandleSlider = component$<TripleHandleSliderProps>(
         (handleIndex === 2 && handleDisabled.handle2);
 
       if (isHandleDisabled) {
+        console.log(
+          "🚫 Triple Handle Slider: Handle",
+          handleIndex,
+          "is disabled"
+        );
         return;
       }
 
+      console.log(
+        "✅ Triple Handle Slider: Starting drag for handle",
+        handleIndex
+      );
       event.preventDefault();
       event.stopPropagation();
 
@@ -420,13 +432,31 @@ export const TripleHandleSlider = component$<TripleHandleSliderProps>(
         activeHandle.value = null;
       };
 
-      document.addEventListener("mousemove", handleMouseMove);
-      document.addEventListener("mouseup", handleMouseUp);
+      // Add event listeners to both document and window for better compatibility
+      const addEventListeners = () => {
+        document.addEventListener("mousemove", handleMouseMove, {
+          passive: false,
+        });
+        document.addEventListener("mouseup", handleMouseUp, { passive: false });
+        window.addEventListener("mousemove", handleMouseMove, {
+          passive: false,
+        });
+        window.addEventListener("mouseup", handleMouseUp, { passive: false });
+      };
 
-      return () => {
+      const removeEventListeners = () => {
         document.removeEventListener("mousemove", handleMouseMove);
         document.removeEventListener("mouseup", handleMouseUp);
+        window.removeEventListener("mousemove", handleMouseMove);
+        window.removeEventListener("mouseup", handleMouseUp);
       };
+
+      // Ensure DOM is ready
+      if (typeof document !== "undefined") {
+        addEventListeners();
+      }
+
+      return removeEventListeners;
     });
 
     return (
