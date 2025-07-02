@@ -142,6 +142,15 @@ export const AgeDistributionControl = component$<AgeDistributionControlProps>(
       margin: 0 auto 1rem;
     }
 
+    /* Smooth transitions to prevent flickering */
+    .pie-chart path {
+      transition: all 0.3s ease;
+    }
+
+    .pie-legend-value {
+      transition: all 0.2s ease;
+    }
+
     .pie-legend {
       display: flex;
       flex-direction: column;
@@ -228,6 +237,12 @@ export const AgeDistributionControl = component$<AgeDistributionControlProps>(
     const childAgeCutoff = useSignal(initialChildAgeCutoff);
     const youthAgeCutoff = useSignal(initialYouthAgeCutoff);
     const seniorAgeCutoff = useSignal(initialSeniorAgeCutoff);
+
+    // Debounced age cutoffs for population calculations (reduces flickering)
+    const debouncedChildAge = useSignal(initialChildAgeCutoff);
+    const debouncedYouthAge = useSignal(initialYouthAgeCutoff);
+    const debouncedSeniorAge = useSignal(initialSeniorAgeCutoff);
+    const debounceTimer = useSignal<number | null>(null);
 
     // Lock constraint signals
     const childLocked = useSignal(false);
@@ -463,7 +478,18 @@ export const AgeDistributionControl = component$<AgeDistributionControlProps>(
       youthAgeCutoff.value = values[1];
       seniorAgeCutoff.value = values[2];
 
-      // Trigger callback
+      // Debounce population data updates to reduce flickering
+      if (debounceTimer.value) {
+        clearTimeout(debounceTimer.value);
+      }
+
+      debounceTimer.value = setTimeout(() => {
+        debouncedChildAge.value = values[0];
+        debouncedYouthAge.value = values[1];
+        debouncedSeniorAge.value = values[2];
+      }, 150) as any; // 150ms debounce
+
+      // Trigger callback immediately for other components
       if (onAgeChange$) {
         onAgeChange$(values);
       }
