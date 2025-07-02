@@ -636,30 +636,42 @@ export const UbiAmountsControl = component$<UbiAmountsControlProps>((props) => {
   // Net UBI cost after taxes and program savings
   const netUbiCost = totalUbiCost - totalTaxRevenue - programSavings;
 
-  // Before tax pie chart data
+  // Before tax pie chart data with safety checks
   const beforeTaxData = [
     {
       label: `👶 ${t("Children")}`,
-      value: childUbiCost,
-      percentage: totalUbiCost > 0 ? (childUbiCost / totalUbiCost) * 100 : 0,
+      value: childUbiCost || 0,
+      percentage:
+        totalUbiCost > 0 && !isNaN(childUbiCost) && !isNaN(totalUbiCost)
+          ? Math.max(0, Math.min(100, (childUbiCost / totalUbiCost) * 100))
+          : 0,
       color: "#3b82f6",
     },
     {
       label: `🧑 ${t("Youth")}`,
-      value: youthUbiCost,
-      percentage: totalUbiCost > 0 ? (youthUbiCost / totalUbiCost) * 100 : 0,
+      value: youthUbiCost || 0,
+      percentage:
+        totalUbiCost > 0 && !isNaN(youthUbiCost) && !isNaN(totalUbiCost)
+          ? Math.max(0, Math.min(100, (youthUbiCost / totalUbiCost) * 100))
+          : 0,
       color: "#10b981",
     },
     {
       label: `👨 ${t("Adults")}`,
-      value: adultUbiCost,
-      percentage: totalUbiCost > 0 ? (adultUbiCost / totalUbiCost) * 100 : 0,
+      value: adultUbiCost || 0,
+      percentage:
+        totalUbiCost > 0 && !isNaN(adultUbiCost) && !isNaN(totalUbiCost)
+          ? Math.max(0, Math.min(100, (adultUbiCost / totalUbiCost) * 100))
+          : 0,
       color: "#f59e0b",
     },
     {
       label: `👴 ${t("Seniors")}`,
-      value: seniorUbiCost,
-      percentage: totalUbiCost > 0 ? (seniorUbiCost / totalUbiCost) * 100 : 0,
+      value: seniorUbiCost || 0,
+      percentage:
+        totalUbiCost > 0 && !isNaN(seniorUbiCost) && !isNaN(totalUbiCost)
+          ? Math.max(0, Math.min(100, (seniorUbiCost / totalUbiCost) * 100))
+          : 0,
       color: "#8b5cf6",
     },
   ];
@@ -1034,33 +1046,63 @@ export const UbiAmountsControl = component$<UbiAmountsControlProps>((props) => {
                 <T text="UBI Cost Before Tax" />
               </h3>
               <svg class="pie-chart" viewBox="0 0 200 200">
-                {beforeTaxData.map((segment, index) => {
-                  const startAngle = beforeTaxData
-                    .slice(0, index)
-                    .reduce((sum, s) => sum + (s.percentage / 100) * 360, 0);
-                  const endAngle =
-                    startAngle + (segment.percentage / 100) * 360;
-                  const largeArcFlag = segment.percentage > 50 ? 1 : 0;
+                {beforeTaxData
+                  .map((segment, index) => {
+                    // Safety checks to prevent 500 errors
+                    if (
+                      !segment ||
+                      typeof segment.percentage !== "number" ||
+                      isNaN(segment.percentage)
+                    ) {
+                      return null;
+                    }
 
-                  const x1 =
-                    100 + 80 * Math.cos(((startAngle - 90) * Math.PI) / 180);
-                  const y1 =
-                    100 + 80 * Math.sin(((startAngle - 90) * Math.PI) / 180);
-                  const x2 =
-                    100 + 80 * Math.cos(((endAngle - 90) * Math.PI) / 180);
-                  const y2 =
-                    100 + 80 * Math.sin(((endAngle - 90) * Math.PI) / 180);
+                    const startAngle = beforeTaxData
+                      .slice(0, index)
+                      .reduce((sum, s) => {
+                        const percentage =
+                          s &&
+                          typeof s.percentage === "number" &&
+                          !isNaN(s.percentage)
+                            ? s.percentage
+                            : 0;
+                        return sum + (percentage / 100) * 360;
+                      }, 0);
 
-                  return (
-                    <path
-                      key={index}
-                      d={`M 100 100 L ${x1} ${y1} A 80 80 0 ${largeArcFlag} 1 ${x2} ${y2} Z`}
-                      fill={segment.color}
-                      stroke="white"
-                      stroke-width="2"
-                    />
-                  );
-                })}
+                    const endAngle =
+                      startAngle + (segment.percentage / 100) * 360;
+                    const largeArcFlag = segment.percentage > 50 ? 1 : 0;
+
+                    // Safety checks for angle calculations
+                    if (isNaN(startAngle) || isNaN(endAngle)) {
+                      return null;
+                    }
+
+                    const x1 =
+                      100 + 80 * Math.cos(((startAngle - 90) * Math.PI) / 180);
+                    const y1 =
+                      100 + 80 * Math.sin(((startAngle - 90) * Math.PI) / 180);
+                    const x2 =
+                      100 + 80 * Math.cos(((endAngle - 90) * Math.PI) / 180);
+                    const y2 =
+                      100 + 80 * Math.sin(((endAngle - 90) * Math.PI) / 180);
+
+                    // Safety checks for coordinate calculations
+                    if (isNaN(x1) || isNaN(y1) || isNaN(x2) || isNaN(y2)) {
+                      return null;
+                    }
+
+                    return (
+                      <path
+                        key={index}
+                        d={`M 100 100 L ${x1} ${y1} A 80 80 0 ${largeArcFlag} 1 ${x2} ${y2} Z`}
+                        fill={segment.color}
+                        stroke="white"
+                        stroke-width="2"
+                      />
+                    );
+                  })
+                  .filter(Boolean)}
               </svg>
               <div class="pie-legend">
                 {beforeTaxData.map((item, index) => (
