@@ -4,6 +4,7 @@ import {
   $,
   useStylesScoped$,
   useTask$,
+  useVisibleTask$,
   useStore,
 } from "@builder.io/qwik";
 import { T, useTranslationState } from "../../contexts/translation-context";
@@ -359,8 +360,8 @@ export const GovernmentSpendingControl =
     // Replacement scenario controls
     const replacementScenarios = useStore<Record<string, number>>({});
 
-    // Update accuracy data when year changes
-    useTask$(async ({ track }) => {
+    // Update accuracy data when year changes (client-side only)
+    useVisibleTask$(async ({ track }) => {
       track(() => year);
       const accuracy = await getDataAccuracy(year);
       accuracyData.level = accuracy.level;
@@ -370,8 +371,8 @@ export const GovernmentSpendingControl =
       accuracyData.color = accuracy.color;
     });
 
-    // Load government spending data
-    useTask$(async ({ track }) => {
+    // Load government spending data (client-side only)
+    useVisibleTask$(async ({ track }) => {
       track(() => year);
 
       try {
@@ -417,8 +418,8 @@ export const GovernmentSpendingControl =
       }
     });
 
-    // Calculate replacement analysis when parameters change
-    useTask$(async ({ track }) => {
+    // Calculate replacement analysis when parameters change (client-side only)
+    useVisibleTask$(async ({ track }) => {
       track(() => ubiCostAnnual);
       track(() => taxRevenue);
       track(() => Object.values(replacementScenarios));

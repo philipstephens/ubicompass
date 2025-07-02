@@ -5,6 +5,7 @@ import {
   $,
   useStylesScoped$,
   useTask$,
+  useVisibleTask$,
   useStore,
 } from "@builder.io/qwik";
 import { TripleHandleSlider } from "../triple-handle-slider/triple-handle-slider";
@@ -282,8 +283,8 @@ export const AgeDistributionControl = component$<AgeDistributionControlProps>(
       error: null as string | null,
     });
 
-    // Load population data from database
-    useTask$(async ({ track }) => {
+    // Load population data from database (client-side only to prevent SSR 500 errors)
+    useVisibleTask$(async ({ track }) => {
       track(() => year);
       track(() => childAgeCutoff.value);
       track(() => youthAgeCutoff.value);
