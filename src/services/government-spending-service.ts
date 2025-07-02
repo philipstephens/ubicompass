@@ -224,16 +224,72 @@ export const validateReplacementPercentages = server$(async (
   replacementPercentages: { [category: string]: number }
 ): Promise<{ valid: boolean; errors: string[] }> => {
   const errors: string[] = [];
-  
+
   // Check that percentages are within valid range
   Object.entries(replacementPercentages).forEach(([category, percentage]) => {
     if (percentage < 0 || percentage > 100) {
       errors.push(`${category}: Percentage must be between 0 and 100`);
     }
   });
-  
+
   return {
     valid: errors.length === 0,
     errors
+  };
+});
+
+// Legacy function names for compatibility with existing components
+export const getGovernmentSpendingSummary = getGovernmentSpending;
+
+export const getSocialProgramsData = server$(async (year: number) => {
+  // Return fallback social programs data
+  return [
+    {
+      programName: 'Old Age Security',
+      amount: 45000000000,
+      replaceable: true,
+      category: 'SOCIAL'
+    },
+    {
+      programName: 'Employment Insurance',
+      amount: 25000000000,
+      replaceable: true,
+      category: 'SOCIAL'
+    },
+    {
+      programName: 'Canada Child Benefit',
+      amount: 24000000000,
+      replaceable: true,
+      category: 'SOCIAL'
+    },
+    {
+      programName: 'Provincial Social Assistance',
+      amount: 15000000000,
+      replaceable: true,
+      category: 'SOCIAL'
+    }
+  ];
+});
+
+export const calculateUbiReplacementAnalysis = server$(async (
+  year: number,
+  ubiCostAnnual: number,
+  taxRevenue: number,
+  replacementScenarios: any
+) => {
+  // Return fallback replacement analysis
+  const spendingData = await getGovernmentSpending(year);
+  const socialPrograms = await getSocialProgramsData(year);
+
+  const totalProgramSavings = socialPrograms.reduce((sum: number, program: any) => {
+    return sum + (program.amount * 0.5); // Assume 50% replacement
+  }, 0);
+
+  return {
+    totalCurrentSpending: spendingData.federalTotal + spendingData.provincialTotal,
+    programSavings: totalProgramSavings,
+    netUbiCost: ubiCostAnnual - totalProgramSavings,
+    replacementRate: 50.0,
+    feasibilityScore: 75.0
   };
 });
