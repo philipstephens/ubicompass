@@ -361,42 +361,21 @@ export const AgeDistributionControl = component$<AgeDistributionControlProps>(
 
         console.log(`📊 Loading population by age array for year ${year}`);
 
-        // For now, use fallback population by age data
-        // In the future, this could call a server function that returns the age array
-        const fallbackPopulationByAge = [
-          // Ages 1-10
-          355000, 365000, 377000, 390000, 402000, 407000, 410000, 417000, 419000, 421000,
-          // Ages 11-20
-          429000, 431000, 429000, 416000, 405000, 398000, 392000, 387000, 383000, 380000,
-          // Ages 21-30
-          378000, 376000, 375000, 374000, 373000, 372000, 371000, 370000, 369000, 368000,
-          // Ages 31-40
-          367000, 366000, 365000, 364000, 363000, 362000, 361000, 360000, 359000, 358000,
-          // Ages 41-50
-          357000, 356000, 355000, 354000, 353000, 352000, 351000, 350000, 349000, 348000,
-          // Ages 51-60
-          347000, 346000, 345000, 344000, 343000, 342000, 341000, 340000, 339000, 338000,
-          // Ages 61-70
-          337000, 336000, 335000, 334000, 333000, 332000, 331000, 330000, 329000, 328000,
-          // Ages 71-80
-          327000, 326000, 325000, 324000, 323000, 322000, 321000, 320000, 319000, 318000,
-          // Ages 81-90
-          317000, 316000, 315000, 314000, 313000, 312000, 311000, 310000, 309000, 308000,
-          // Ages 91-100
-          307000, 306000, 305000, 304000, 303000, 302000, 301000, 300000, 299000, 298000
-        ];
+        // Get population by age array from database (with fallback)
+        const { getPopulationByAge } = await import('~/lib/db');
+        const populationByAge = await getPopulationByAge(year);
 
-        populationStore.populationByAge = fallbackPopulationByAge;
+        populationStore.populationByAge = populationByAge;
         populationStore.currentYear = year;
         populationStore.isLoading = false;
 
-        console.log(`✅ Loaded population array with ${fallbackPopulationByAge.length} age groups`);
+        console.log(`✅ Loaded population array with ${populationByAge.length} age groups`);
 
       } catch (error) {
 
         // Initial calculation with current age cutoffs
         const initialDistribution = await calculatePopulationFromAgeArray(
-          fallbackPopulationByAge,
+          populationByAge,
           childAgeCutoff.value,
           youthAgeCutoff.value,
           seniorAgeCutoff.value

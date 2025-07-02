@@ -1,12 +1,12 @@
 import type { RequestHandler } from '@builder.io/qwik-city';
-// Database temporarily disabled - using fallback data
+import { getAvailableYears, isDbAvailable } from '~/lib/db';
 
 export const onGet: RequestHandler = async ({ json }) => {
   try {
-    console.log('API: Returning fallback available years');
+    console.log(`API: Fetching available years, DB available: ${isDbAvailable}`);
 
-    // Fallback available years
-    const availableYears = [2000, 2005, 2010, 2015, 2020, 2022];
+    // Get available years from database (with fallback)
+    const availableYears = await getAvailableYears();
     console.log('API: Available years:', availableYears);
 
     json(200, {

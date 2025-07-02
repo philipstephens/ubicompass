@@ -1,8 +1,9 @@
 /**
  * Statistics Service for Qwik UBI Compass
- * Provides access to Statistics Canada data (database temporarily disabled)
+ * Provides access to Statistics Canada data with database support
  */
 import { server$ } from '@builder.io/qwik-city';
+import { getPopulationByAge, isDbAvailable } from '~/lib/db';
 
 // Population data interface
 export interface PopulationData {
@@ -38,27 +39,41 @@ export const getPopulationData = server$(async (
   youthAgeCutoff: number = 24,
   seniorAgeCutoff: number = 65
 ): Promise<PopulationData> => {
-  // Database temporarily disabled - return fallback data
-  const fallbackData = {
-    totalPopulation: 38000000,
-    childPopulation: 7000000,
-    youthPopulation: 4000000,
-    adultPopulation: 20000000,
-    seniorPopulation: 7000000
-  };
-  
-  // Adjust fallback data based on year
-  if (year <= 2005) {
-    fallbackData.totalPopulation = 32000000;
-  } else if (year <= 2010) {
-    fallbackData.totalPopulation = 34000000;
-  } else if (year <= 2015) {
-    fallbackData.totalPopulation = 36000000;
-  } else if (year <= 2020) {
-    fallbackData.totalPopulation = 37500000;
+  console.log(`📊 Getting population data for year ${year}, DB available: ${isDbAvailable}`);
+
+  // Get population by age array from database (with fallback)
+  const populationByAge = await getPopulationByAge(year);
+
+  // Calculate population distribution from age array
+  let childPop = 0;
+  let youthPop = 0;
+  let adultPop = 0;
+  let seniorPop = 0;
+
+  // Sum population by age ranges (ages 1-100, array is 0-indexed)
+  for (let age = 1; age <= 100; age++) {
+    const population = populationByAge[age - 1] || 0;
+
+    if (age <= childAgeCutoff) {
+      childPop += population;
+    } else if (age <= youthAgeCutoff) {
+      youthPop += population;
+    } else if (age >= seniorAgeCutoff) {
+      seniorPop += population;
+    } else {
+      adultPop += population;
+    }
   }
 
-  return fallbackData;
+  const totalPop = childPop + youthPop + adultPop + seniorPop;
+
+  return {
+    totalPopulation: totalPop,
+    childPopulation: childPop,
+    youthPopulation: youthPop,
+    adultPopulation: adultPop,
+    seniorPopulation: seniorPop
+  };
 });
 
 /**
