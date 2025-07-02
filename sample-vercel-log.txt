@@ -1,0 +1,51 @@
+[17:04:08.287] Running build in Washington, D.C., USA (East) – iad1
+[17:04:08.288] Build machine configuration: 2 cores, 8 GB
+[17:04:08.302] Cloning github.com/philipstephens/ubicompass (Branch: main, Commit: 62da7e9)
+[17:04:08.864] Cloning completed: 562.000ms
+[17:04:10.171] Restored build cache from previous deployment (GX1NDCZqSdLAPqmZuxQs5iirL7QN)
+[17:04:11.073] Running "vercel build"
+[17:04:11.497] Vercel CLI 43.3.0
+[17:04:12.065] Warning: Detected "engines": { "node": "^18.17.0 || ^20.3.0 || >=21.0.0" } in your `package.json` that will automatically upgrade when a new major Node.js Version is released. Learn More: http://vercel.link/node-version
+[17:04:12.081] Installing dependencies...
+[17:04:15.585] npm warn deprecated npmlog@5.0.1: This package is no longer supported.
+[17:04:15.936] npm warn deprecated gauge@3.0.2: This package is no longer supported.
+[17:04:16.037] npm warn deprecated are-we-there-yet@2.0.0: This package is no longer supported.
+[17:04:16.316] npm warn deprecated @npmcli/move-file@1.1.2: This functionality has been moved to @npmcli/fs
+[17:04:16.420] npm warn deprecated vm2@3.9.19: The library contains critical security issues and should not be used for production! The maintenance of the project has been discontinued. Consider migrating your code to isolated-vm.
+[17:04:21.016] 
+[17:04:21.018] added 668 packages, removed 14 packages, and changed 2 packages in 9s
+[17:04:21.019] 
+[17:04:21.020] 381 packages are looking for funding
+[17:04:21.021]   run `npm fund` for details
+[17:04:21.098] Running "npm run vercel-build"
+[17:04:21.226] 
+[17:04:21.226] > ubi-compass@1.0.0 vercel-build
+[17:04:21.227] > qwik build
+[17:04:27.007] undefined
+[17:04:27.007] 
+[17:04:27.007] Error: Command failed with exit code 1: npm run build.server
+[17:04:27.008]     at makeError (/vercel/path0/node_modules/@builder.io/qwik/dist/cli.cjs:3584:13)
+[17:04:27.008]     at handlePromise (/vercel/path0/node_modules/@builder.io/qwik/dist/cli.cjs:4496:29)
+[17:04:27.008]     at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+[17:04:27.008]     at async Promise.all (index 0)
+[17:04:27.008]     at async runBuildCommand (/vercel/path0/node_modules/@builder.io/qwik/dist/cli.cjs:4850:5)
+[17:04:27.008]     at async runCommand2 (/vercel/path0/node_modules/@builder.io/qwik/dist/cli.cjs:5492:7)
+[17:04:27.008]     at async Object.runCli (/vercel/path0/node_modules/@builder.io/qwik/dist/cli.cjs:5480:5) {
+[17:04:27.008]   shortMessage: 'Command failed with exit code 1: npm run build.server',
+[17:04:27.008]   command: 'npm run build.server',
+[17:04:27.008]   escapedCommand: 'npm run build.server',
+[17:04:27.008]   exitCode: 1,
+[17:04:27.009]   signal: undefined,
+[17:04:27.009]   signalDescription: undefined,
+[17:04:27.009]   stdout: undefined,
+[17:04:27.009]   stderr: undefined,
+[17:04:27.009]   cwd: '/vercel/path0',
+[17:04:27.009]   failed: true,
+[17:04:27.009]   timedOut: false,
+[17:04:27.009]   isCanceled: false,
+[17:04:27.009]   killed: false
+[17:04:27.009] }
+[17:04:27.009] 
+[17:04:27.022] Error: Command "npm run vercel-build" exited with 1
+[17:04:27.384] 
+[17:04:30.125] Exiting build container

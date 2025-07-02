@@ -100,17 +100,12 @@ export const onPost: RequestHandler = async ({ json, request, env }) => {
 
           // Form labels that might have different text
           'Child Age Cutoff:': 'Âge Limite Enfant:',
-          'Child Age Cutoff': 'Âge Limite Enfant',
           'Children under 18 receive child UBI': 'Les enfants de moins de 18 reçoivent le RUB enfant',
           'Flat Tax Percentage:': 'Pourcentage d\'Impôt Uniforme:',
-          'Flat Tax Percentage': 'Pourcentage d\'Impôt Uniforme',
           'Tax Exemption Amount:': 'Montant d\'Exemption Fiscale:',
-          'Tax Exemption Amount': 'Montant d\'Exemption Fiscale',
           'No tax on first $24k of income': 'Aucun impôt sur les premiers $24k de revenu',
 
           // Dynamic text patterns (these might be constructed with variables)
-          'No tax on first': 'Aucun impôt sur les premiers',
-          'of income': 'de revenu',
           '% of GDP': '% du PIB',
           '% of Government Budget': '% du Budget Gouvernemental',
 
@@ -149,7 +144,6 @@ export const onPost: RequestHandler = async ({ json, request, env }) => {
           'Feasibility Assessment Methodology': 'Méthodologie d\'Évaluation de Faisabilité',
           'GDP Percentage Thresholds': 'Seuils de Pourcentage du PIB',
           'Based on international economic research and existing social program scales.': 'Basé sur la recherche économique internationale et l\'échelle des programmes sociaux existants.',
-          'Economic Context': 'Contexte Économique',
           'Canadian GDP 2022': 'PIB Canadien 2022',
           'Total Gov\'t Spending': 'Dépenses Gouvernementales Totales',
           'Current Social Programs': 'Programmes Sociaux Actuels',
