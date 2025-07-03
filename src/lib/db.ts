@@ -10,13 +10,18 @@ let isDbAvailable = false;
 // Test database connection
 async function testConnection() {
   try {
-    if (!process.env.POSTGRES_URL) {
-      console.log('📊 No POSTGRES_URL found - using fallback mode');
+    // Check for any of the common database URL environment variables
+    const dbUrl = process.env.POSTGRES_URL || process.env.DATABASE_URL || process.env.POSTGRES_PRISMA_URL;
+
+    if (!dbUrl) {
+      console.log('📊 No database URL found - using fallback mode');
+      console.log('💡 Available env vars:', Object.keys(process.env).filter(key => key.includes('POSTGRES') || key.includes('DATABASE')));
       return false;
     }
 
-    await sql`SELECT 1`;
-    console.log('✅ Database connection successful');
+    console.log('🔌 Testing database connection...');
+    await sql`SELECT 1 as test`;
+    console.log('✅ Database connection successful (Neon PostgreSQL)');
     isDbAvailable = true;
     return true;
   } catch (error) {
@@ -130,11 +135,14 @@ export async function getAvailableYears() {
 
 /**
  * Get population by age for a specific year
+ * Returns array of 101 elements for ages 0-100
  */
 export async function getPopulationByAge(year: number): Promise<number[]> {
   if (!isDbAvailable) {
-    // Return fallback population by age array (ages 1-100)
+    // Return fallback population by age array (ages 0-100)
     return [
+      // Age 0
+      380000,
       // Ages 1-10
       355000, 365000, 377000, 390000, 402000, 407000, 410000, 417000, 419000, 421000,
       // Ages 11-20
@@ -162,23 +170,25 @@ export async function getPopulationByAge(year: number): Promise<number[]> {
     const result = await sql`
       SELECT age, population
       FROM population_by_age
-      WHERE year = ${year} AND age BETWEEN 1 AND 100
+      WHERE year = ${year} AND age BETWEEN 0 AND 100
       ORDER BY age
     `;
 
-    // Convert to array indexed by age (1-100)
-    const populationArray = new Array(100).fill(0);
+    // Convert to array indexed by age (0-100)
+    const populationArray = new Array(101).fill(0);
     result.rows.forEach(row => {
-      if (row.age >= 1 && row.age <= 100) {
-        populationArray[row.age - 1] = row.population;
+      if (row.age >= 0 && row.age <= 100) {
+        populationArray[row.age] = row.population;
       }
     });
 
     return populationArray;
   } catch (error) {
     console.error('Database query failed, using fallback population:', error);
-    // Return fallback data on error
+    // Return fallback data on error (ages 0-100)
     return [
+      // Age 0
+      380000,
       // Ages 1-10
       355000, 365000, 377000, 390000, 402000, 407000, 410000, 417000, 419000, 421000,
       // Ages 11-20

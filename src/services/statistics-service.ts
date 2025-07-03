@@ -5,13 +5,16 @@
 import { server$ } from '@builder.io/qwik-city';
 import { getPopulationByAge, isDbAvailable } from '~/lib/db';
 
-// Population data interface
+// Population data interface with arrays for ages
 export interface PopulationData {
-  totalPopulation: number;
-  childPopulation: number;
-  youthPopulation: number;
-  adultPopulation: number;
-  seniorPopulation: number;
+  year: number;
+  total: number;
+  ages: number[];  // Array of 101 elements (ages 0-100)
+  // Simplified age distribution for calculations
+  children: number;    // 0-17
+  youth: number;       // 18-24
+  adults: number;      // 25-64
+  seniors: number;     // 65+
 }
 
 // Economic data interface
@@ -35,44 +38,52 @@ export const getAvailableYears = server$(async (): Promise<number[]> => {
  */
 export const getPopulationData = server$(async (
   year: number,
-  childAgeCutoff: number = 18,
-  youthAgeCutoff: number = 24,
-  seniorAgeCutoff: number = 65
+  childAgeCutoff: number = 17,  // Updated to match new interface (0-17)
+  youthAgeCutoff: number = 24,  // Updated to match new interface (18-24)
+  seniorAgeCutoff: number = 65  // Updated to match new interface (65+)
 ): Promise<PopulationData> => {
   console.log(`📊 Getting population data for year ${year}, DB available: ${isDbAvailable}`);
 
   // Get population by age array from database (with fallback)
   const populationByAge = await getPopulationByAge(year);
 
+  // Ensure we have a complete array (ages 0-100)
+  const completeAges = new Array(101).fill(0);
+  for (let i = 0; i < Math.min(populationByAge.length, 101); i++) {
+    completeAges[i] = populationByAge[i] || 0;
+  }
+
   // Calculate population distribution from age array
-  let childPop = 0;
-  let youthPop = 0;
-  let adultPop = 0;
-  let seniorPop = 0;
+  let childPop = 0;   // 0-17
+  let youthPop = 0;   // 18-24
+  let adultPop = 0;   // 25-64
+  let seniorPop = 0;  // 65+
 
-  // Sum population by age ranges (ages 1-100, array is 0-indexed)
-  for (let age = 1; age <= 100; age++) {
-    const population = populationByAge[age - 1] || 0;
+  // Sum population by age ranges (ages 0-100)
+  for (let age = 0; age <= 100; age++) {
+    const population = completeAges[age] || 0;
 
-    if (age <= childAgeCutoff) {
+    if (age <= 17) {
       childPop += population;
-    } else if (age <= youthAgeCutoff) {
+    } else if (age <= 24) {
       youthPop += population;
-    } else if (age >= seniorAgeCutoff) {
-      seniorPop += population;
-    } else {
+    } else if (age <= 64) {
       adultPop += population;
+    } else {
+      seniorPop += population;
     }
   }
 
   const totalPop = childPop + youthPop + adultPop + seniorPop;
 
   return {
-    totalPopulation: totalPop,
-    childPopulation: childPop,
-    youthPopulation: youthPop,
-    adultPopulation: adultPop,
-    seniorPopulation: seniorPop
+    year: year,
+    total: totalPop,
+    ages: completeAges,
+    children: childPop,
+    youth: youthPop,
+    adults: adultPop,
+    seniors: seniorPop
   };
 });
 

@@ -10,7 +10,10 @@ import {
   useComputed$,
 } from "@builder.io/qwik";
 import { TripleHandleSlider } from "../triple-handle-slider/triple-handle-slider";
-import { getPopulationData } from "../../services/statistics-service";
+import {
+  getPopulationData,
+  type PopulationData,
+} from "../../services/statistics-service";
 import { T, useTranslationState } from "../../contexts/translation-context";
 
 export interface AgeDistributionControlProps {
@@ -24,13 +27,7 @@ export interface AgeDistributionControlProps {
 
   // Callbacks
   onAgeChange$?: (values: [number, number, number]) => void;
-  onPopulationDataChange$?: (populationData: {
-    childPopulation: number;
-    youthPopulation: number;
-    adultPopulation: number;
-    seniorPopulation: number;
-    totalPopulation: number;
-  }) => void;
+  onPopulationDataChange$?: (populationData: PopulationData) => void;
   onConstraintsChange$?: (constraints: {
     childLocked: boolean;
     youthLocked: boolean;
@@ -249,11 +246,11 @@ export const AgeDistributionControl = component$<AgeDistributionControlProps>(
       ) => {
         if (!populationByAge || populationByAge.length === 0) {
           return {
-            childPopulation: 0,
-            youthPopulation: 0,
-            adultPopulation: 0,
-            seniorPopulation: 0,
-            totalPopulation: 0,
+            children: 0,
+            youth: 0,
+            adults: 0,
+            seniors: 0,
+            total: 0,
           };
         }
 
@@ -262,9 +259,9 @@ export const AgeDistributionControl = component$<AgeDistributionControlProps>(
         let adultPop = 0;
         let seniorPop = 0;
 
-        // Sum population by age ranges (ages 1-100, array is 0-indexed)
-        for (let age = 1; age <= 100; age++) {
-          const population = populationByAge[age - 1] || 0;
+        // Sum population by age ranges (ages 0-100, array is indexed by age)
+        for (let age = 0; age <= 100; age++) {
+          const population = populationByAge[age] || 0;
 
           if (age <= childMax) {
             childPop += population;
@@ -280,11 +277,11 @@ export const AgeDistributionControl = component$<AgeDistributionControlProps>(
         const totalPop = childPop + youthPop + adultPop + seniorPop;
 
         return {
-          childPopulation: childPop,
-          youthPopulation: youthPop,
-          adultPopulation: adultPop,
-          seniorPopulation: seniorPop,
-          totalPopulation: totalPop,
+          children: childPop,
+          youth: youthPop,
+          adults: adultPop,
+          seniors: seniorPop,
+          total: totalPop,
         };
       }
     );
@@ -334,15 +331,15 @@ export const AgeDistributionControl = component$<AgeDistributionControlProps>(
 
     // Population data store
     const populationStore = useStore({
-      childPopulation: 0,
-      youthPopulation: 0,
-      adultPopulation: 0,
-      seniorPopulation: 0,
-      totalPopulation: 0,
+      children: 0,
+      youth: 0,
+      adults: 0,
+      seniors: 0,
+      total: 0,
       isLoading: true,
       error: null as string | null,
-      // Store population by age array (ages 1-100)
-      populationByAge: [] as number[],
+      // Store population by age array (ages 0-100)
+      ages: [] as number[],
       currentYear: -1, // Track which year's data we have loaded
     });
 
@@ -362,16 +359,16 @@ export const AgeDistributionControl = component$<AgeDistributionControlProps>(
         console.log(`📊 Loading population by age array for year ${year}`);
 
         // Get population by age array from database (with fallback)
-        const { getPopulationByAge } = await import('~/lib/db');
+        const { getPopulationByAge } = await import("~/lib/db");
         const populationByAge = await getPopulationByAge(year);
 
-        populationStore.populationByAge = populationByAge;
+        populationStore.ages = populationByAge;
         populationStore.currentYear = year;
         populationStore.isLoading = false;
 
-        console.log(`✅ Loaded population array with ${populationByAge.length} age groups`);
-
-      } catch (error) {
+        console.log(
+          `✅ Loaded population array with ${populationByAge.length} age groups`
+        );
 
         // Initial calculation with current age cutoffs
         const initialDistribution = await calculatePopulationFromAgeArray(
@@ -381,11 +378,11 @@ export const AgeDistributionControl = component$<AgeDistributionControlProps>(
           seniorAgeCutoff.value
         );
 
-        populationStore.childPopulation = initialDistribution.childPopulation;
-        populationStore.youthPopulation = initialDistribution.youthPopulation;
-        populationStore.adultPopulation = initialDistribution.adultPopulation;
-        populationStore.seniorPopulation = initialDistribution.seniorPopulation;
-        populationStore.totalPopulation = initialDistribution.totalPopulation;
+        populationStore.children = initialDistribution.children;
+        populationStore.youth = initialDistribution.youth;
+        populationStore.adults = initialDistribution.adults;
+        populationStore.seniors = initialDistribution.seniors;
+        populationStore.total = initialDistribution.total;
       } catch (error) {
         console.error("Error loading population data:", error);
         populationStore.error = "Failed to load population data";
@@ -532,30 +529,34 @@ export const AgeDistributionControl = component$<AgeDistributionControlProps>(
       track(() => seniorAgeCutoff.value);
 
       // Only recalculate if we have population data loaded
-      if (populationStore.populationByAge.length > 0 && !populationStore.isLoading) {
-        console.log(`🔄 Recalculating population distribution from cached age array`);
+      if (populationStore.ages.length > 0 && !populationStore.isLoading) {
+        console.log(
+          `🔄 Recalculating population distribution from cached age array`
+        );
 
         const distribution = await calculatePopulationFromAgeArray(
-          populationStore.populationByAge,
+          populationStore.ages,
           childAgeCutoff.value,
           youthAgeCutoff.value,
           seniorAgeCutoff.value
         );
 
-        populationStore.childPopulation = distribution.childPopulation;
-        populationStore.youthPopulation = distribution.youthPopulation;
-        populationStore.adultPopulation = distribution.adultPopulation;
-        populationStore.seniorPopulation = distribution.seniorPopulation;
-        populationStore.totalPopulation = distribution.totalPopulation;
+        populationStore.children = distribution.children;
+        populationStore.youth = distribution.youth;
+        populationStore.adults = distribution.adults;
+        populationStore.seniors = distribution.seniors;
+        populationStore.total = distribution.total;
 
         // Trigger callback with updated population data
         if (onPopulationDataChange$) {
           onPopulationDataChange$({
-            childPopulation: distribution.childPopulation,
-            youthPopulation: distribution.youthPopulation,
-            adultPopulation: distribution.adultPopulation,
-            seniorPopulation: distribution.seniorPopulation,
-            totalPopulation: distribution.totalPopulation,
+            year: year,
+            total: distribution.total,
+            ages: populationStore.ages,
+            children: distribution.children,
+            youth: distribution.youth,
+            adults: distribution.adults,
+            seniors: distribution.seniors,
           });
         }
       }
@@ -681,45 +682,37 @@ export const AgeDistributionControl = component$<AgeDistributionControlProps>(
     const populationData = useComputed$(() => [
       {
         label: `👶 ${t("Children")}`,
-        value: populationStore.childPopulation,
+        value: populationStore.children,
         percentage:
-          populationStore.totalPopulation > 0
-            ? (populationStore.childPopulation /
-                populationStore.totalPopulation) *
-              100
+          populationStore.total > 0
+            ? (populationStore.children / populationStore.total) * 100
             : 0,
         color: "#3b82f6",
       },
       {
         label: `🧑 ${t("Youth")}`,
-        value: populationStore.youthPopulation,
+        value: populationStore.youth,
         percentage:
-          populationStore.totalPopulation > 0
-            ? (populationStore.youthPopulation /
-                populationStore.totalPopulation) *
-              100
+          populationStore.total > 0
+            ? (populationStore.youth / populationStore.total) * 100
             : 0,
         color: "#10b981",
       },
       {
         label: `👨 ${t("Adults")}`,
-        value: populationStore.adultPopulation,
+        value: populationStore.adults,
         percentage:
-          populationStore.totalPopulation > 0
-            ? (populationStore.adultPopulation /
-                populationStore.totalPopulation) *
-              100
+          populationStore.total > 0
+            ? (populationStore.adults / populationStore.total) * 100
             : 0,
         color: "#f59e0b",
       },
       {
         label: `👴 ${t("Seniors")}`,
-        value: populationStore.seniorPopulation,
+        value: populationStore.seniors,
         percentage:
-          populationStore.totalPopulation > 0
-            ? (populationStore.seniorPopulation /
-                populationStore.totalPopulation) *
-              100
+          populationStore.total > 0
+            ? (populationStore.seniors / populationStore.total) * 100
             : 0,
         color: "#8b5cf6",
       },
@@ -853,11 +846,12 @@ export const AgeDistributionControl = component$<AgeDistributionControlProps>(
                   <T text="Population Chart" />
                 </h3>
 
-                {populationStore.isLoading && populationStore.populationByAge.length === 0 && (
-                  <div style="text-align: center; padding: 2rem; color: #6b7280;">
-                    <T text="Loading population data..." />
-                  </div>
-                )}
+                {populationStore.isLoading &&
+                  populationStore.ages.length === 0 && (
+                    <div style="text-align: center; padding: 2rem; color: #6b7280;">
+                      <T text="Loading population data..." />
+                    </div>
+                  )}
 
                 {populationStore.error && (
                   <div style="text-align: center; padding: 2rem; color: #dc2626; background: #fef2f2; border-radius: 0.5rem; margin-bottom: 1rem;">
@@ -869,7 +863,8 @@ export const AgeDistributionControl = component$<AgeDistributionControlProps>(
                   </div>
                 )}
 
-                {(populationStore.populationByAge.length > 0 || !populationStore.isLoading) && (
+                {(populationStore.ages.length > 0 ||
+                  !populationStore.isLoading) && (
                   <>
                     <svg class="pie-chart" viewBox="0 0 200 200">
                       {populationData.value.map((segment, index) => {
